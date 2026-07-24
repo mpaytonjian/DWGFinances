@@ -1,0 +1,4 @@
+file,entity,account,period,imported,gross_inflows,gross_outflows,net,duplicates,transfers,cc_payments,personal,review,control_total,reconciled
+June_2026_DWG_Capital_Partners.xlsx,DWG Capital Partners,01004,,99,16950.79,13714.409999999996,-3236.3800000000047,0,4,4,0,7,-3236.3800000000047,Tie
+Mar-June_2026_DWGRE_Amex_Charges.xlsx,DWG Capital Group,81005,"Feb 21, 2026 – Jun 11, 2026",40,22620.0,26987.05,4367.049999999999,0,5,5,2,5,4367.049999999999,Tie
+Mar-May_2026_DWGCP_Amex_Charges.xlsx,DWG Capital Partners,01004,"Feb 21, 2026 – May 29, 2026",101,18477.34,28501.699999999997,10024.359999999997,0,2,2,10,17,10024.359999999997,Tie
