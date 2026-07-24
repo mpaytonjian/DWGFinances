@@ -56,6 +56,11 @@ def match_transfers(master):
                 continue
             if round(i["cash_inflow"], 2) != amt:
                 continue
+            # A leg cannot match within the same account: a real transfer moves
+            # value between two different accounts/entities.
+            if (i["source_entity"] == o["source_entity"]
+                    and i["account_last4"] == o["account_last4"]):
+                continue
             idd = _parse(i["transaction_date"])
             if od and idd and abs((od - idd).days) <= DATE_TOLERANCE_DAYS:
                 match = (idx, i)

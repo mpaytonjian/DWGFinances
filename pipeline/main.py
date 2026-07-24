@@ -165,12 +165,16 @@ def _money(v):
 
 
 def _write_executive_md(master, transfers, controls_results, path):
-    t25 = reporting.pl_totals(master, config.FY_2025)
-    t26 = reporting.pl_totals(master, config.FY_2026)
-    m25 = reporting.monthly_pl(master, config.FY_2025)
-    m26 = reporting.monthly_pl(master, config.FY_2026)
+    DWG = config.DWG_OPERATING_ENTITIES
+    POS = [config.ENTITY_POS_PARTNERS, config.ENTITY_POS_ASSET]
+    t25 = reporting.pl_totals(master, config.FY_2025, DWG)
+    t26 = reporting.pl_totals(master, config.FY_2026, DWG)
+    p25 = reporting.pl_totals(master, config.FY_2025, POS)
+    p26 = reporting.pl_totals(master, config.FY_2026, POS)
+    m25 = reporting.monthly_pl(master, config.FY_2025, DWG)
+    m26 = reporting.monthly_pl(master, config.FY_2026, DWG)
     burn26 = (sum(v["expense"] for v in m26.values()) / len(m26)) if m26 else 0
-    payroll = sum(reporting.pl_summary(master).get(config.FSG_COMP, {}).values())
+    payroll = sum(reporting.pl_summary(master, entities=DWG).get(config.FSG_COMP, {}).values())
     pers = reporting.personal_paid_by_business(master)
     bp = reporting.business_paid_personally(master)
     reviews = reporting.review_items(master)
@@ -189,7 +193,8 @@ def _write_executive_md(master, transfers, controls_results, path):
              f"{len(files)} source workbook(s). Additional source files listed in "
              "the assignment are not yet loaded — figures will change materially "
              "as they arrive.\n")
-    L.append("## Headline Numbers\n")
+    L.append("## Headline Numbers — DWG Operating (Capital Group + Capital Partners)\n")
+    L.append("Poseidon and personal entities are reported separately below, NOT consolidated.\n")
     L.append("| Metric | 2025 (FY) | 2026 (YTD) |")
     L.append("|---|--:|--:|")
     L.append(f"| Revenue | {_money(t25['revenue'])} | {_money(t26['revenue'])} |")
@@ -199,6 +204,13 @@ def _write_executive_md(master, transfers, controls_results, path):
     L.append(f"| Total Expenses | {_money(t25['total_expense'])} | {_money(t26['total_expense'])} |")
     L.append(f"| **Preliminary Operating Income / EBITDA** | **{_money(t25['operating_income'])}** | "
              f"**{_money(t26['operating_income'])}** |")
+    L.append("")
+    L.append("## Related Entities — Poseidon (separate, not consolidated)\n")
+    L.append("| Metric | 2025 (FY) | 2026 (YTD) |")
+    L.append("|---|--:|--:|")
+    L.append(f"| Revenue | {_money(p25['revenue'])} | {_money(p26['revenue'])} |")
+    L.append(f"| Total Expenses | {_money(p25['total_expense'])} | {_money(p26['total_expense'])} |")
+    L.append(f"| Preliminary Operating Income | {_money(p25['operating_income'])} | {_money(p26['operating_income'])} |")
     L.append("")
     L.append("## Cash & Run-Rate\n")
     L.append(f"- **2026 average monthly operating spend (burn):** {_money(burn26)}")

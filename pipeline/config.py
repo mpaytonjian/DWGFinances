@@ -75,6 +75,10 @@ ACCOUNT_LAST4_TO_ENTITY = {
     "02000": ENTITY_POS_PARTNERS,
     "7008": ENTITY_DWGCP,   # XXXX-XXXXXX-27008  The Plum Card (Entity = DWG Capital Partners per statement)
     "27008": ENTITY_DWGCP,
+    "27000": ENTITY_JOHN,   # XXXX-XXXXXX-27000  Amex Platinum — John L Dunning personal
+    "1168": ENTITY_DWGCG,   # Chase 1168 — DWG Capital Group operating bank
+    "9335": ENTITY_POS_ASSET,  # Chase 9335 — Poseidon Asset Group bank
+    "1117": ENTITY_ANGELA,  # Chase 1117 — Angela personal bank
 }
 
 # Free-text entity strings found in workbook headers -> canonical entity.

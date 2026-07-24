@@ -23,10 +23,21 @@ from .normalize import (normalize_merchant, normalize_description, fingerprint,
 CC_PAYMENT_ACCOUNT = "Credit Cards Payable"
 
 
-def _business_personal(rec, gl_account):
-    """Return ('Business'|'Personal'|'Review', reason) from the B/P flag + category."""
+_PERSONAL_ENTITIES = {config.ENTITY_JOHN, config.ENTITY_ANGELA,
+                      config.ENTITY_FAMILY, config.ENTITY_VENMO}
+_BUSINESS_HINTS = ("dwg", "costar", "sponsorcloud", "sponsor cloud", "crexi",
+                   "listing platform", "loopnet", "e&o", "notary", "underwriting",
+                   "deal", "investor", "conference", "commission", "brokerage",
+                   "payroll", "office reimb")
+
+
+def _business_personal(rec, gl_account, source_entity):
+    """Return ('Business'|'Personal', reason) from B/P flag, category, and the
+    nature of the source account. Personal-account activity defaults to
+    Personal; business-account activity defaults to Business."""
     flag = str(rec.get("bp_flag") or "").strip().upper()
     cat = str(rec.get("category") or "").strip().lower()
+    desc = str(rec.get("description") or "").strip().lower()
     if flag in ("P", "P?", "PERSONAL"):
         return "Personal", "B/P flag = personal"
     if "personal" in cat:
@@ -35,7 +46,12 @@ def _business_personal(rec, gl_account):
         return "Personal", "category marked family/household"
     if flag == "B":
         return "Business", "B/P flag = business"
-    return "Business", "assumed business (card is a business account)"
+    if source_entity in _PERSONAL_ENTITIES:
+        text = cat + " " + desc
+        if any(h in text for h in _BUSINESS_HINTS):
+            return "Business", "business indicator on personal account (review)"
+        return "Personal", "assumed personal (personal account, no business indicator)"
+    return "Business", "assumed business (business account)"
 
 
 def classify(rec, overrides):
@@ -56,6 +72,25 @@ def classify(rec, overrides):
         category, merch_raw, desc_raw, overrides)
     deal = category_rules.parse_deal(category, rec.get("notes"), desc_raw)
 
+    # Owner transfers: direction decides contribution vs distribution.
+    if gl == "Owner Distributions" and amt_raw < 0:
+        gl = "Owner Contributions"
+    fsg = config.COA_BY_NAME[gl][1]
+
+    # Cash withdrawals always require review (mapped to suspense/owner).
+    _txt = f"{category} {desc_raw}".lower()
+    is_cash_withdrawal = any(k in _txt for k in
+                             ("atm", "cash withdrawal", "withdrawal", "cash advance"))
+
+    # Material deal-related INFLOWS (closing proceeds, recoveries, escrow
+    # returns) must not net against deal costs — they need a revenue vs
+    # reimbursement vs pass-through determination.
+    if fsg == config.FSG_DEAL and amt_raw < -1000:
+        gl = "Suspense & Review"
+        fsg = config.FSG_SUSPENSE
+        cat_conf = min(cat_conf, 58)
+        cat_basis = "deal inflow -> revenue/reimbursement review"
+
     # --- direction ---
     is_inflow = amt_raw < 0
     cash_in = -amt_raw if is_inflow else 0.0
@@ -69,7 +104,7 @@ def classify(rec, overrides):
     is_loan = fsg == config.FSG_BALANCE and gl in ("Loan Proceeds", "Loan Principal",
                                                    "Member Loans")
     is_interest = gl == "Interest Expense"
-    bp, bp_reason = _business_personal(rec, gl)
+    bp, bp_reason = _business_personal(rec, gl, source_entity)
     is_personal = (bp == "Personal")
     is_refund = (amt_raw < 0 and not is_cc_payment and gl not in
                  ("Loan Proceeds",))
@@ -109,6 +144,14 @@ def classify(rec, overrides):
     treatment, review_status, review_reason = _propose_treatment(
         gl, fsg, is_cc_payment, is_personal, is_loan, is_refund, deal,
         amt_raw, confidence, source_entity, bp_reason)
+    if is_cash_withdrawal and review_status != "Review":
+        review_status = "Review"
+        review_reason = (review_reason + "; " if review_reason else "") + \
+            "Cash withdrawal — review regardless of amount"
+    if gl == "Intercompany Transfers" and review_status != "Review":
+        review_status = "Review"
+        review_reason = (review_reason + "; " if review_reason else "") + \
+            "Transfer — verify counterparty and matching"
 
     row = {
         # identity / source

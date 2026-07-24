@@ -15,6 +15,9 @@ def _match_text(text):
     t = (text or "").strip().lower()
     if not t:
         return None
+    # Normalize separators so filenames like "Poseidon_Partners" and
+    # "Mar-June_2026" match space-delimited entity keys.
+    t = t.replace("_", " ").replace("-", " ")
     for key, entity in config.ENTITY_TEXT_MAP.items():
         if key in t:
             return entity

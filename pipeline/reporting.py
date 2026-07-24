@@ -99,7 +99,7 @@ def entity_comparison(master, year=None):
     return out
 
 
-def top_categories(master, year=None, n=10):
+def top_categories(master, year=None, n=10, entities=None):
     agg = defaultdict(float)
     for r in master:
         if not _pl_eligible(r):
@@ -108,16 +108,20 @@ def top_categories(master, year=None, n=10):
             continue
         if year and r["year"] != year:
             continue
+        if entities and r["source_entity"] not in entities:
+            continue
         agg[r["combined_category"]] += (r["cash_outflow"] - r["cash_inflow"])
     return sorted(agg.items(), key=lambda kv: -kv[1])[:n]
 
 
-def top_vendors(master, year=None, n=10):
+def top_vendors(master, year=None, n=10, entities=None):
     agg = defaultdict(float)
     for r in master:
         if not _pl_eligible(r):
             continue
         if year and r["year"] != year:
+            continue
+        if entities and r["source_entity"] not in entities:
             continue
         agg[r["merchant_normalized"] or "(unknown)"] += (r["cash_outflow"] - r["cash_inflow"])
     return sorted(agg.items(), key=lambda kv: -kv[1])[:n]
@@ -133,18 +137,28 @@ def top_deals(master, n=10):
     return sorted(agg.items(), key=lambda kv: -kv[1])[:n]
 
 
+BUSINESS_ENTITIES = [config.ENTITY_DWGCP, config.ENTITY_DWGCG,
+                     config.ENTITY_POS_PARTNERS, config.ENTITY_POS_ASSET]
+
+
 def personal_paid_by_business(master):
     return [r for r in master if r["business_or_personal"] == "Personal"
-            and r["source_entity"] in config.DWG_OPERATING_ENTITIES
+            and r["source_entity"] in BUSINESS_ENTITIES
             and r["potential_duplicate"] != "Duplicate"]
 
 
 def business_paid_personally(master):
+    """Business EXPENSES on personal accounts. Balance-sheet rows (transfers,
+    card payments, withdrawals) are excluded — they are not reimbursable
+    operating expenses."""
     personal_entities = {config.ENTITY_JOHN, config.ENTITY_ANGELA,
                          config.ENTITY_FAMILY, config.ENTITY_VENMO}
     return [r for r in master if r["source_entity"] in personal_entities
             and r["business_or_personal"] == "Business"
-            and r["potential_duplicate"] != "Duplicate"]
+            and r["potential_duplicate"] != "Duplicate"
+            and r["credit_card_payment"] != "Yes"
+            and r["financial_statement_group"] in
+            (config.FSG_COMP, config.FSG_OPEX, config.FSG_DEAL)]
 
 
 def review_items(master):

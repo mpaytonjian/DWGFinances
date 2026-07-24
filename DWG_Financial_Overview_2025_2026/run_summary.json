@@ -1,8 +1,8 @@
 {
-  "files": 8,
-  "transactions": 3299,
-  "duplicate_groups": 0,
-  "transfers": 47,
+  "files": 18,
+  "transactions": 12247,
+  "duplicate_groups": 50,
+  "transfers": 511,
   "controls_passed": 10,
   "controls_total": 10
 }

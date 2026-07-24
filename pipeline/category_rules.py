@@ -47,9 +47,39 @@ def _kw(*words):
 RULES = [
     # ---- Credit-card payments (balance sheet) -------------------------------
     (_kw("online amex pmt", "online amex payment", "online payment - thank",
-         "autopay", "auto pay", "payment - thank", "mobile payment"),
+         "autopay", "auto pay", "payment - thank", "mobile payment",
+         "amex credit card payment", "american express credit card",
+         "credit card pmt", "credit card payment", "amex epayment",
+         "amex payment"),
      "Credit Cards Payable", config.CONF_DETERMINISTIC),
     (lambda t: t.strip() in ("payment", "credit"), "Credit Cards Payable", 92),
+
+    # ---- Revenue (bank inflows) ---------------------------------------------
+    (_kw("incoming commission", "dwg commission", "commissions sta"),
+     "Brokerage Commissions", 95),
+    # Pass-through wires: inbound wire creates a due-to; outbound "Due to X –
+    # Pass-Through" legs settle it. Only the retained split is revenue — the
+    # gross flows are balance sheet, never P&L. All flagged for review.
+    (_kw("pass-through", "pass through"), "Due To Related Parties", 62),
+    (_kw("incoming crystal asset management"), "Suspense & Review", 55),
+    (_kw("mortgage coverage"), "Suspense & Review", 55),
+
+    # ---- Owner / related-person transfers -----------------------------------
+    (_kw("transfer to angela", "transfer from angela", "angela dunning"),
+     "Owner Distributions", 75),   # flipped to Contributions on inflow
+
+    # ---- Intercompany / account transfers (balance sheet) -------------------
+    (_kw("transfer to dwg", "transfer from dwg", "transfer to poseidon",
+         "transfer from poseidon", "poseidon asset group (incoming",
+         "transfer to ecomm", "transfer from ecomm"),
+     "Intercompany Transfers", 92),
+    (_kw("transfer to", "transfer from"),   # third-party transfers: review
+     "Intercompany Transfers", 62),
+    (lambda t: t.strip() == "venmo" or "venmo funding" in t,
+     "Intercompany Transfers", 62),   # match against Venmo ledger when loaded
+
+    # ---- Loan / bridge servicing --------------------------------------------
+    (_kw("forward bridge payment", "bridge payment"), "Loan Principal", 72),
 
     # ---- Points / refunds / credits (contra) --------------------------------
     (_kw("points redemption", "pay with points", "amex travel pay with points",
@@ -76,8 +106,9 @@ RULES = [
     (_kw("employee bonus", "bonus"), "Payroll", 82),
     (_kw("recruiting", "recruit", "indeed", "linkedin recruiter"),
      "Recruiting", 88),
-    (_kw("contractor", "1099", "notary services", "notary"),
-     "Contractor Compensation", 78),
+    (_kw("contractor", "1099", "notary services", "notary", "upwork",
+         "zelle -", "zelle-"),
+     "Contractor Compensation", 72),
     (_kw("commission"), "Commissions Paid", 80),
     (_kw("employee tech onboarding", "tech onboarding"), "Software & Technology", 80),
     (_kw("employee benefit", "health insurance", "benefits"),
@@ -99,6 +130,7 @@ RULES = [
          "quickbooks", "adobe", "google", "microsoft", "socialpilot", "zoom",
          "slack", "dropbox", "bestbuy", "best buy", "apple.com", "operational subscription"),
      "Software & Technology", 86),
+    (_kw("godaddy", "go daddy"), "Software & Technology", 90),
 
     # ---- Marketing / IR -----------------------------------------------------
     (_kw("marketing", "advertis", "mailchimp", "canva"), "Marketing", 80),

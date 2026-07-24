@@ -178,20 +178,28 @@ def _sheet_exec(bk, master, transfers):
     ws.write(2, 0, f"2025 full year and 2026 YTD (through {config.YTD_2026_THROUGH})",
              bk.f_sub)
 
-    t25 = reporting.pl_totals(master, config.FY_2025)
-    t26 = reporting.pl_totals(master, config.FY_2026)
+    DWG = config.DWG_OPERATING_ENTITIES
+    t25 = reporting.pl_totals(master, config.FY_2025, DWG)
+    t26 = reporting.pl_totals(master, config.FY_2026, DWG)
     row = 4
-    row = _kpi_block(bk, ws, row, "2025 (Full Year — Preliminary)", t25)
-    row = _kpi_block(bk, ws, row, f"2026 YTD (through {config.YTD_2026_THROUGH})", t26)
+    row = _kpi_block(bk, ws, row, "2025 DWG Operating (CG+CP, Full Year — Preliminary)", t25)
+    row = _kpi_block(bk, ws, row, f"2026 DWG Operating YTD (through {config.YTD_2026_THROUGH})", t26)
+    # Related entities shown separately — NOT consolidated into DWG results
+    row = _kpi_block(bk, ws, row, "Poseidon Entities (separate — not in DWG results) 2025",
+                     reporting.pl_totals(master, config.FY_2025,
+                                         [config.ENTITY_POS_PARTNERS, config.ENTITY_POS_ASSET]))
+    row = _kpi_block(bk, ws, row, "Poseidon Entities (separate) 2026 YTD",
+                     reporting.pl_totals(master, config.FY_2026,
+                                         [config.ENTITY_POS_PARTNERS, config.ENTITY_POS_ASSET]))
 
     # Operating metrics
     ws.write(row, 0, "Key Operating Metrics", bk.f_sub_hdr)
     ws.write(row, 1, "", bk.f_sub_hdr); row += 1
-    m25 = reporting.monthly_pl(master, config.FY_2025)
-    m26 = reporting.monthly_pl(master, config.FY_2026)
+    m25 = reporting.monthly_pl(master, config.FY_2025, DWG)
+    m26 = reporting.monthly_pl(master, config.FY_2026, DWG)
     avg_opex_25 = (sum(v["expense"] for v in m25.values()) / len(m25)) if m25 else 0
     avg_opex_26 = (sum(v["expense"] for v in m26.values()) / len(m26)) if m26 else 0
-    payroll = sum(reporting.pl_summary(master).get(config.FSG_COMP, {}).values())
+    payroll = sum(reporting.pl_summary(master, entities=DWG).get(config.FSG_COMP, {}).values())
     personal_biz = sum(abs(r["amount_raw"]) for r in reporting.personal_paid_by_business(master))
     biz_personal = sum(abs(r["amount_raw"]) for r in reporting.business_paid_personally(master))
     unmatched_xfer = sum(1 for t in transfers if t["status"].startswith("Unmatched"))
@@ -258,7 +266,7 @@ def _sheet_exec(bk, master, transfers):
         ws.insert_chart(chart_start, 4, chart)
 
     # Expense composition pie
-    top = reporting.top_categories(master, n=8)
+    top = reporting.top_categories(master, n=8, entities=DWG)
     if top:
         pie_start = data_last + 3
         ws.write(pie_start, 0, "Top Expense Categories", bk.f_sub_hdr)
@@ -316,25 +324,25 @@ def _sheet_pl(bk, name, master, year):
     ws = bk.sheet(name)
     ws.set_column(0, 0, 40); ws.set_column(1, 1, 18)
     ws.hide_gridlines(2)
-    ws.write(0, 0, f"{name} — {config.ENTITY_DWGCP} + {config.ENTITY_DWGCG} (Consolidated)",
+    ws.write(0, 0, f"{name} — {config.ENTITY_DWGCP} + {config.ENTITY_DWGCG} (DWG Operating, Consolidated)",
              bk.f_title)
     ws.write(1, 0, config.REPORT_TITLE, bk.f_sub)
-    ws.write(2, 0, "Excludes credit-card payments, intercompany transfers, personal items, duplicates.",
-             bk.f_sub)
-    _write_pl_body(bk, ws, master, year, entities=None, start=4)
+    ws.write(2, 0, "DWG operating entities only. Excludes Poseidon/personal entities, credit-card "
+             "payments, intercompany transfers, personal items, duplicates.", bk.f_sub)
+    _write_pl_body(bk, ws, master, year, entities=config.DWG_OPERATING_ENTITIES, start=4)
     ws.freeze_panes(4, 0)
 
 
 def _sheet_monthly(bk, master):
     ws = bk.sheet("Monthly P&L")
     ws.hide_gridlines(2)
-    ws.write(0, 0, "Monthly P&L — Consolidated DWG Operating", bk.f_title)
+    ws.write(0, 0, "Monthly P&L — Consolidated DWG Operating (CG+CP only)", bk.f_title)
     ws.write(1, 0, config.REPORT_TITLE, bk.f_sub)
     col = 0
     ws.set_column(0, 0, 22)
     row0 = 3
     for year in (config.FY_2025, config.FY_2026):
-        m = reporting.monthly_pl(master, year)
+        m = reporting.monthly_pl(master, year, config.DWG_OPERATING_ENTITIES)
         ws.write(row0, col, f"{year}", bk.f_hdr)
         ws.write(row0, col + 1, "Revenue", bk.f_hdr)
         ws.write(row0, col + 2, "Expense", bk.f_hdr)
@@ -422,10 +430,16 @@ def _detail_sheet(bk, name, title, rows, note=""):
 
 
 def _sheet_revenue(bk, master):
-    rows = [r for r in master if r["financial_statement_group"] == config.FSG_REVENUE
-            and r["potential_duplicate"] != "Duplicate"]
-    _detail_sheet(bk, "Revenue Detail", "Revenue Detail & Inflow Review", rows,
-                  "Every material inflow with proposed treatment (revenue vs non-revenue).")
+    # Revenue-review table: every classified-revenue row PLUS every other
+    # material inflow (>= $1,000) so no cash-in escapes the revenue decision.
+    rows = [r for r in master if r["potential_duplicate"] != "Duplicate"
+            and (r["financial_statement_group"] == config.FSG_REVENUE
+                 or (r["cash_inflow"] >= 1000
+                     and r["credit_card_payment"] != "Yes"))]
+    rows.sort(key=lambda r: -r["cash_inflow"])
+    _detail_sheet(bk, "Revenue Detail", "Revenue Detail & Material Inflow Review", rows,
+                  "Every material inflow with proposed treatment (revenue vs transfer vs "
+                  "contribution vs pass-through). Only confirmed revenue rows enter the P&L.")
 
 
 def _sheet_payroll(bk, master):

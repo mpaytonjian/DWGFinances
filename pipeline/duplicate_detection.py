@@ -36,7 +36,9 @@ def detect_duplicates(master):
     for key, rows in groups.items():
         if len(rows) < 2:
             continue
-        distinct_files = {r["source_file"] for r in rows}
+        # An "export unit" is (file, sheet): a multi-year workbook's two Details
+        # sheets are separate exports and can genuinely overlap.
+        distinct_files = {(r["source_file"], r["source_sheet"]) for r in rows}
         ordered = sorted(rows, key=lambda r: (r["source_file"], r["source_row"]))
 
         if len(distinct_files) >= 2:

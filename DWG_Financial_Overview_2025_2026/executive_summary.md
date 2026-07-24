@@ -3,95 +3,105 @@
 
 > Preliminary management reporting compiled from available transaction-level source data. The information remains subject to bank reconciliation, entity allocation, accrual adjustments, balance-sheet substantiation, management review, and CPA approval.
 
-**Scope of this draft:** 3,299 transactions from 8 source workbook(s). Additional source files listed in the assignment are not yet loaded — figures will change materially as they arrive.
+**Scope of this draft:** 12,247 transactions from 18 source workbook(s). Additional source files listed in the assignment are not yet loaded — figures will change materially as they arrive.
 
-## Headline Numbers
+## Headline Numbers — DWG Operating (Capital Group + Capital Partners)
+
+Poseidon and personal entities are reported separately below, NOT consolidated.
 
 | Metric | 2025 (FY) | 2026 (YTD) |
 |---|--:|--:|
-| Revenue | $0.00 | $0.00 |
-| Operating Expenses | $130,653.16 | $114,012.19 |
-| Deal & Asset Costs | $34,481.63 | $4,160.69 |
-| Total Expenses | $165,134.79 | $118,172.88 |
-| **Preliminary Operating Income / EBITDA** | **($165,134.79)** | **($118,172.88)** |
+| Revenue | $426,437.00 | $114,000.00 |
+| Operating Expenses | $426,646.26 | $322,676.74 |
+| Deal & Asset Costs | $245,091.77 | $40,783.90 |
+| Total Expenses | $671,738.03 | $363,460.64 |
+| **Preliminary Operating Income / EBITDA** | **($245,301.03)** | **($249,460.64)** |
+
+## Related Entities — Poseidon (separate, not consolidated)
+
+| Metric | 2025 (FY) | 2026 (YTD) |
+|---|--:|--:|
+| Revenue | $1,033,938.62 | $435,155.44 |
+| Total Expenses | $1,045,770.81 | $40,700.18 |
+| Preliminary Operating Income | ($11,832.19) | $394,455.26 |
 
 ## Cash & Run-Rate
 
-- **2026 average monthly operating spend (burn):** $19,695.48
-- **Compensation / contractor total (all periods loaded):** $15,322.64
-- **Personal expenses paid by business:** $115,237.81 across 248 items → propose Due From Owner / Distribution
-- **Business expenses paid personally:** $0.00 across 0 items → propose Due To Owner / reimbursable
-- **Unmatched intercompany / card-payment legs:** 47 (bank side not yet loaded)
+- **2026 average monthly operating spend (burn):** $60,576.77
+- **Compensation / contractor total (all periods loaded):** $594,607.13
+- **Personal expenses paid by business:** $778,318.35 across 2955 items → propose Due From Owner / Distribution
+- **Business expenses paid personally:** $17,059.15 across 95 items → propose Due To Owner / reimbursable
+- **Unmatched intercompany / card-payment legs:** 338 (bank side not yet loaded)
 
 ## Largest Expense Categories
 
 | GL Account | Amount |
 |---|--:|
-| Data & Listing Platforms | $73,761.13 |
-| Travel | $49,463.42 |
-| Deal - Pursuit Costs | $38,642.32 |
-| Software & Technology | $26,508.57 |
-| Legal | $21,994.39 |
-| Payroll | $13,446.53 |
-| Conferences | $12,805.00 |
-| Auto | $12,019.53 |
-| Investor Relations | $8,882.43 |
-| Office | $7,679.35 |
+| Deal - Pursuit Costs | $1,131,056.08 |
+| Payroll | $490,640.68 |
+| Contractor Compensation | $117,805.30 |
+| Commissions Paid | $98,282.50 |
+| Data & Listing Platforms | $90,504.76 |
+| Software & Technology | $56,537.24 |
+| Travel | $53,008.90 |
+| Legal | $31,994.39 |
+| Office | $29,596.02 |
+| Professional Services | $28,723.11 |
 
 ## Top Vendors
 
 | Vendor | Amount |
 |---|--:|
+| DOMESTIC WIRE TRANSFER VIA | $620,000.00 |
+| ONLINE DOMESTIC WIRE TRANSFER | $428,412.50 |
+| BASIC ONLINE PAYROLL PAYMENT | $354,206.74 |
+| DOMESTIC WIRE TRANSFER A | $125,000.00 |
+| ONLINE REALTIME VENDOR PAYMENT | $55,000.00 |
+| ORIG CO NAME MARICOPA | $46,528.05 |
+| ZELLE PAYMENT TO JEFF | $43,423.00 |
+| ONLINE INTERNATIONAL WIRE TRANSFER | $31,805.00 |
 | MCTO TAX PAYMENT | $23,243.89 |
-| LEV INC NEW YORK | $18,000.00 |
-| SPONSORCLOUD SYNPROSALT LAKE CITY | $17,669.27 |
-| LAW OFFICES OF MONIKA | $17,000.00 |
-| LIGHTBOX PARENT SHELTON CT | $11,902.68 |
-| LEV INC | $10,250.00 |
-| EXPEDIA COM TRAVEL SEATTLE | $9,513.66 |
-| COSTAR GROUP INC | $9,247.18 |
-| IPFS IPFS INS PMT | $8,287.62 |
-| CAMPAIGNER SVC 888 845 | $8,176.00 |
+| SPONSORCLOUD SYNPROSALT LAKE CITY | $18,858.62 |
 
 ## Deal-Specific Spending
 
 | Deal / Asset | Amount |
 |---|--:|
+| Cloverdale | $155,000.00 |
 | buckeye shapeform | $100,000.00 |
+| Jal Breese | $50,000.00 |
+| Hibbert | $46,528.05 |
+| Moab | $33,397.00 |
 | 260 S Hibbert - Taxes | $23,243.89 |
+| Tbd | $15,000.00 |
 | cash reimbursement | $11,300.00 |
 | 260 S Hibbert - Insurance | $8,287.62 |
 | Atlanta, GA | $5,128.54 |
-| Jal Southbend | $2,500.00 |
-| jc whitner | $2,000.00 |
-| Bankhead Marketing | $1,323.03 |
-| Roanoke, VA | $1,262.87 |
-| 260 S Hibbert - Marketing | $1,055.92 |
 
 ## Twenty Largest Unresolved / Review Items
 
 | Date | Entity | Description | Amount | Reason |
 |---|---|---|--:|---|
-| 2026-04-29 | DWG Capital Partners | Buckeye Shapeform | $50,000.00 | Loan/debt activity — review regardless of amount |
-| 2026-04-14 | DWG Capital Partners | Buckeye Shapeform | $50,000.00 | Loan/debt activity — review regardless of amount |
-| 2025-08-03 | Unassigned / Allocation Required | CREDIT - DISTRIBUTION OF PAYMENT | ($26,819.93) | Refund/credit/points |
-| 2025-08-03 | Unassigned / Allocation Required | DEBIT - DISTRIBUTION OF PAYMENT | $26,819.93 | Unmapped category |
-| 2025-12-05 | DWG Capital Partners | MCTO TAX PAYMENT | $20,243.89 | Deal-specific cost >= $5,000 |
-| 2026-04-09 | Poseidon Partners | EXPEDIA 720730796057EXPEDIA.COM WA | $15,341.71 | Unmapped category |
-| 2026-05-07 | DWG Capital Group | LIGHTBOX PARENT SHELTON CT | $11,902.68 | Amount >= $10,000 |
-| 2025-10-09 | DWG Capital Partners | COMMON LOTS 0000 | $11,350.00 | Loan/debt activity — review regardless of amount |
-| 2025-10-21 | DWG Capital Partners | COMMONLOTS LLC 65000CAMARILLO | $11,300.00 | Loan/debt activity — review regardless of amount |
-| 2025-10-17 | DWG Capital Partners | COMMON LOTS | ($11,300.00) | Loan/debt activity — review regardless of amount |
-| 2025-08-04 | Unassigned / Allocation Required | BOB'S WATCHES NEWPORT BEACH CA | $11,081.94 | Personal item (category marked personal) |
-| 2025-08-03 | Unassigned / Allocation Required | ADJ REDIST PURCHASE BAL | ($9,614.51) | Refund/credit/points |
-| 2025-08-03 | Unassigned / Allocation Required | DR ADJ REDIST CADV PRIN | $9,614.51 | Unmapped category |
-| 2025-03-23 | DWG Capital Partners | EXPEDIA 730623009872EXPEDIA.COM | $9,210.12 | Personal item (B/P flag = personal) |
-| 2025-07-01 | DWG Capital Partners | IPFS*IPFS INS PMT | $8,287.62 | Deal-specific cost >= $5,000 |
-| 2025-02-07 | Unassigned / Allocation Required | SPONSORCLOUD (SYNPROSALT LAKE CITY UT | $7,200.00 | Entity unassigned |
-| 2025-03-25 | DWG Capital Partners | EXPEDIA 730619164038EXPEDIA.COM | ($7,194.44) | Personal item (B/P flag = personal) |
-| 2025-03-23 | DWG Capital Partners | EXPEDIA 730619164038EXPEDIA.COM | $7,194.44 | Personal item (B/P flag = personal) |
-| 2025-09-29 | Unassigned / Allocation Required | THE HANGAR Santa Monica CA | $7,193.05 | Personal item (category marked personal) |
-| 2025-12-29 | DWG Capital Partners | FS *WICKANINNISH INNTOFINO | $6,653.07 | Personal item (B/P flag = personal) |
+| 2026-03-04 | DWG Capital Partners | Online Transfer to CHK ...8605 transac | $2,800,000.00 | Amount >= $10,000 |
+| 2026-03-02 | DWG Capital Partners | Online Transfer from CHK ...8605 trans | ($2,800,000.00) | Refund/credit/points |
+| 2026-04-02 | DWG Capital Partners | Online Transfer to CHK ...9816 transac | $2,000,000.00 | Amount >= $10,000 |
+| 2026-03-30 | DWG Capital Partners | Online Transfer from CHK ...9816 trans | ($2,000,000.00) | Refund/credit/points |
+| 2026-04-02 | DWG Capital Partners | Online Transfer to CHK ...8605 transac | $975,000.00 | Amount >= $10,000 |
+| 2026-03-30 | DWG Capital Partners | Online Transfer from CHK ...8605 trans | ($975,000.00) | Refund/credit/points |
+| 2025-12-17 | Poseidon Asset Group | BOOK TRANSFER B/O: GI CAPITAL GROUP RI | ($625,000.00) | Refund/credit/points |
+| 2025-12-18 | Poseidon Asset Group | DOMESTIC WIRE TRANSFER VIA: ZIONS BANC | $620,000.00 | Deal-specific cost >= $5,000 |
+| 2026-02-13 | DWG Capital Group | FEDWIRE CREDIT VIA: TEXAS CAPITAL BANK | ($600,000.00) | Refund/credit/points |
+| 2026-02-17 | DWG Capital Group | DOMESTIC WIRE TRANSFER A/C: MITCHELL A | $413,000.00 | Amount >= $10,000 |
+| 2025-02-19 | DWG Capital Group | FEDWIRE CREDIT VIA: WELLS FARGO BANK,  | ($390,093.39) | Refund/credit/points |
+| 2026-03-04 | DWG Capital Partners | Online Transfer to CHK ...9816 transac | $380,000.00 | Amount >= $10,000 |
+| 2026-03-02 | DWG Capital Partners | Online Transfer from CHK ...9816 trans | ($380,000.00) | Refund/credit/points |
+| 2025-12-22 | DWG Capital Partners | BOOK TRANSFER CREDIT B/O: NATIONAL FIN | ($325,000.00) | Refund/credit/points |
+| 2025-11-26 | DWG Capital Partners | Online Transfer to CHK ...9335 transac | $270,000.00 | Amount >= $10,000 |
+| 2025-11-26 | DWG Capital Partners | Online Transfer from CHK ...5153 trans | ($270,000.00) | Refund/credit/points |
+| 2025-11-26 | Poseidon Asset Group | Online Transfer from CHK ...3922 trans | ($270,000.00) | Refund/credit/points |
+| 2025-02-20 | DWG Capital Group | DOMESTIC WIRE TRANSFER VIA: CITIBANK N | $266,065.37 | Amount >= $10,000 |
+| 2025-10-01 | DWG Capital Partners | Online Transfer to CHK ...8577 transac | $250,000.00 | Amount >= $10,000 |
+| 2025-10-01 | DWG Capital Partners | Online Transfer from CHK ...8577 trans | ($250,000.00) | Refund/credit/points |
 
 ## Reliability Limitations
 
