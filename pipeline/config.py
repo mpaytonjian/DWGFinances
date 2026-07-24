@@ -64,11 +64,17 @@ ALL_ENTITIES = [
 DWG_OPERATING_ENTITIES = [ENTITY_DWGCP, ENTITY_DWGCG]
 
 # Account last-four -> canonical entity.  Extend as new statements arrive.
+# NOTE: account number is the most deterministic entity signal and overrides
+# filename. Confirmed from each workbook's Entity/header block.
 ACCOUNT_LAST4_TO_ENTITY = {
-    "1004": ENTITY_DWGCP,   # XXXX-XXXXXX-01004  Amex Business Platinum
+    "1004": ENTITY_DWGCP,   # XXXX-XXXXXX-01004  Amex Business Platinum (DWGCP)
     "01004": ENTITY_DWGCP,
-    "1005": ENTITY_DWGCG,   # XXXX-XXXXXX-81005  Amex Business Platinum
+    "1005": ENTITY_DWGCG,   # XXXX-XXXXXX-81005  Amex Business Platinum (DWGCG)
     "81005": ENTITY_DWGCG,
+    "2000": ENTITY_POS_PARTNERS,   # XXXX-XXXXXX-02000  Poseidon Partners Amex
+    "02000": ENTITY_POS_PARTNERS,
+    "7008": ENTITY_DWGCP,   # XXXX-XXXXXX-27008  The Plum Card (Entity = DWG Capital Partners per statement)
+    "27008": ENTITY_DWGCP,
 }
 
 # Free-text entity strings found in workbook headers -> canonical entity.
@@ -83,7 +89,7 @@ ENTITY_TEXT_MAP = {
     "poseidon partners": ENTITY_POS_PARTNERS,
     "poseidon asset group": ENTITY_POS_ASSET,
     "poseidon asset": ENTITY_POS_ASSET,
-    "plum card": ENTITY_DWGCG,      # Plum Card is a DWG Amex charge card (default; review)
+    "plum card": ENTITY_DWGCP,      # Plum Card statements carry Entity = DWG Capital Partners
     "family": ENTITY_FAMILY,
     "angela": ENTITY_ANGELA,
     "john l dunning": ENTITY_JOHN,

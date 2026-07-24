@@ -31,6 +31,8 @@ def _business_personal(rec, gl_account):
         return "Personal", "B/P flag = personal"
     if "personal" in cat:
         return "Personal", "category marked personal"
+    if "family" in cat:
+        return "Personal", "category marked family/household"
     if flag == "B":
         return "Business", "B/P flag = business"
     return "Business", "assumed business (card is a business account)"

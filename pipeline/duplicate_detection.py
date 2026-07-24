@@ -32,26 +32,40 @@ def detect_duplicates(master):
         groups[_dup_key(row)].append(row)
 
     dup_group_seq = 0
+    same_file_seq = 0
     for key, rows in groups.items():
         if len(rows) < 2:
             continue
-        # Are they actually from different source files/rows? (true overlap)
-        distinct_sources = {(r["source_file"], r["source_row"]) for r in rows}
-        if len(distinct_sources) < 2:
-            continue
-        dup_group_seq += 1
-        gid = f"DUP-{dup_group_seq:04d}"
+        distinct_files = {r["source_file"] for r in rows}
         ordered = sorted(rows, key=lambda r: (r["source_file"], r["source_row"]))
-        for i, r in enumerate(ordered):
-            r["duplicate_group_id"] = gid
-            if i == 0:
-                r["potential_duplicate"] = "Primary"
-            else:
-                r["potential_duplicate"] = "Duplicate"
-                r["review_status"] = "Duplicate-Excluded"
-                if "Duplicate" not in (r["review_reason"] or ""):
-                    r["review_reason"] = (r["review_reason"] + "; " if r["review_reason"]
-                                          else "") + "Duplicate of " + gid
+
+        if len(distinct_files) >= 2:
+            # TRUE duplicate export: same txn in >=2 different source files
+            # (overlapping periods). First occurrence stays; rest excluded.
+            dup_group_seq += 1
+            gid = f"DUP-{dup_group_seq:04d}"
+            for i, r in enumerate(ordered):
+                r["duplicate_group_id"] = gid
+                if i == 0:
+                    r["potential_duplicate"] = "Primary"
+                else:
+                    r["potential_duplicate"] = "Duplicate"
+                    r["review_status"] = "Duplicate-Excluded"
+                    r["review_reason"] = ((r["review_reason"] + "; " if r["review_reason"]
+                                           else "") + f"Cross-file duplicate ({gid})")
+        else:
+            # SAME-FILE repeat: identical key within one export. Most likely two
+            # genuinely separate charges (e.g. two tickets). Flag for review but
+            # DO NOT exclude from totals — excluding would understate expense.
+            same_file_seq += 1
+            gid = f"SFR-{same_file_seq:04d}"
+            for r in ordered:
+                r["duplicate_group_id"] = gid
+                r["potential_duplicate"] = "Same-File Repeat"
+                if r["review_status"] not in ("Review",):
+                    r["review_status"] = "Review"
+                r["review_reason"] = ((r["review_reason"] + "; " if r["review_reason"]
+                                       else "") + f"Same-file repeat — verify not double-entered ({gid})")
     return dup_group_seq
 
 

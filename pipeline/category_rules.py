@@ -135,7 +135,9 @@ RULES = [
      "Banking & Wire Fees", 85),
     (_kw("license", "dues", "membership"), "Licenses & Dues", 75),
 
-    # ---- Personal -----------------------------------------------------------
+    # ---- Personal / family --------------------------------------------------
+    (_kw("family trip", "family travel"), "Travel", 60),
+    (_kw("family", "household"), "General & Administrative", 55),
     (_kw("personal health"), "General & Administrative", 55),
     (lambda t: t.strip() == "personal" or "personal" in t, "Suspense & Review", 50),
 
