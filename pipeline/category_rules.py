@@ -57,6 +57,10 @@ RULES = [
     # ---- Revenue (bank inflows) ---------------------------------------------
     (_kw("incoming commission", "dwg commission", "commissions sta"),
      "Brokerage Commissions", 95),
+    # Charlmont closing wire is counted in the source workbook's own Commission
+    # statement tab (DWGCG 2025: $661,437 over 10 wires) — management's own
+    # classification, so book as commission (strong evidence, still reviewable).
+    (_kw("charlmont closing"), "Brokerage Commissions", 88),
     # Pass-through wires: inbound wire creates a due-to; outbound "Due to X –
     # Pass-Through" legs settle it. Only the retained split is revenue — the
     # gross flows are balance sheet, never P&L. All flagged for review.

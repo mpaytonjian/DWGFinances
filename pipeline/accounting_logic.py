@@ -82,6 +82,14 @@ def classify(rec, overrides):
     is_cash_withdrawal = any(k in _txt for k in
                              ("atm", "cash withdrawal", "withdrawal", "cash advance"))
 
+    # OUTFLOWS mapped into a revenue account are commission splits / payouts
+    # (e.g. Charlmont wire out to Offset Capital), not negative revenue.
+    if config.COA_BY_NAME[gl][1] == config.FSG_REVENUE and amt_raw > 0:
+        gl = "Commissions Paid"
+        fsg = config.COA_BY_NAME[gl][1]
+        cat_conf = min(cat_conf, 80)
+        cat_basis = "revenue-category outflow -> commission split/payout"
+
     # Material deal-related INFLOWS (closing proceeds, recoveries, escrow
     # returns) must not net against deal costs — they need a revenue vs
     # reimbursement vs pass-through determination.

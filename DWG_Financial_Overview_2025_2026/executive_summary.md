@@ -11,11 +11,11 @@ Poseidon and personal entities are reported separately below, NOT consolidated.
 
 | Metric | 2025 (FY) | 2026 (YTD) |
 |---|--:|--:|
-| Revenue | $426,437.00 | $114,000.00 |
-| Operating Expenses | $426,646.26 | $322,676.74 |
-| Deal & Asset Costs | $245,091.77 | $40,783.90 |
+| Revenue | $661,437.00 | $114,000.00 |
+| Operating Expenses | $451,646.26 | $322,676.74 |
+| Deal & Asset Costs | $220,091.77 | $40,783.90 |
 | Total Expenses | $671,738.03 | $363,460.64 |
-| **Preliminary Operating Income / EBITDA** | **($245,301.03)** | **($249,460.64)** |
+| **Preliminary Operating Income / EBITDA** | **($10,301.03)** | **($249,460.64)** |
 
 ## Related Entities — Poseidon (separate, not consolidated)
 
@@ -28,7 +28,7 @@ Poseidon and personal entities are reported separately below, NOT consolidated.
 ## Cash & Run-Rate
 
 - **2026 average monthly operating spend (burn):** $60,576.77
-- **Compensation / contractor total (all periods loaded):** $594,607.13
+- **Compensation / contractor total (all periods loaded):** $619,607.13
 - **Personal expenses paid by business:** $778,318.35 across 2955 items → propose Due From Owner / Distribution
 - **Business expenses paid personally:** $17,059.15 across 95 items → propose Due To Owner / reimbursable
 - **Unmatched intercompany / card-payment legs:** 338 (bank side not yet loaded)
@@ -37,10 +37,10 @@ Poseidon and personal entities are reported separately below, NOT consolidated.
 
 | GL Account | Amount |
 |---|--:|
-| Deal - Pursuit Costs | $1,131,056.08 |
+| Deal - Pursuit Costs | $1,106,056.08 |
 | Payroll | $490,640.68 |
+| Commissions Paid | $123,282.50 |
 | Contractor Compensation | $117,805.30 |
-| Commissions Paid | $98,282.50 |
 | Data & Listing Platforms | $90,504.76 |
 | Software & Technology | $56,537.24 |
 | Travel | $53,008.90 |
