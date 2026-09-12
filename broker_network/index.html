@@ -1,421 +1,424 @@
 <title>DWG Broker Network</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#1a1a1a;
-    --paper:#f7f6f4;
-    --panel:#ffffff;
-    --line:#d8d5cf;
-    --line-soft:#e9e7e2;
-    --muted:#6f6b64;
-    --accent:#1a1a1a;
-    --tag-main:#3a3a3a;
-    --tag-ohio:#8a8478;
-    --tag-az:#5f6b57;
-    --radius:3px;
-    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 6px 18px rgba(0,0,0,.05);
+    --ground:#f6f7f9;
+    --surface:#ffffff;
+    --surface-2:#eef1f4;
+    --line:#dde2e8;
+    --line-soft:#eaeef2;
+    --ink:#14181d;
+    --ink-2:#3d4650;
+    --muted:#69747f;
+    --accent:#FF671C;
+    --accent-ink:#ffffff;
+    --accent-wash:rgba(255,103,28,.09);
+    --accent-line:rgba(255,103,28,.42);
+    --tag-slb:#4a5560;
+    --tag-oh:#7a6a46;
+    --tag-az:#4f6b57;
+    --focus:#1f6feb;
+    --logo-invert:1;
+    --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --bar-h:0px;
   }
-  :root:not([data-theme="light"]){
-    --ink:#ececec;
-    --paper:#151515;
-    --panel:#1e1e1e;
-    --line:#3a3a3a;
-    --line-soft:#2a2a2a;
-    --muted:#9a9691;
-    --accent:#ececec;
-    --tag-main:#4a4a4a;
-    --tag-ohio:#6b6459;
-    --tag-az:#5c6b52;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.3);
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0f1216;
+      --surface:#171b21;
+      --surface-2:#1e242b;
+      --line:#2b323b;
+      --line-soft:#232a32;
+      --ink:#e6e9ed;
+      --ink-2:#c2c9d1;
+      --muted:#8b96a4;
+      --accent:#FF671C;
+      --accent-ink:#160b04;
+      --accent-wash:rgba(255,103,28,.14);
+      --accent-line:rgba(255,103,28,.5);
+      --tag-slb:#5d6873;
+      --tag-oh:#8a7750;
+      --tag-az:#5c7a64;
+      --focus:#58a6ff;
+      --logo-invert:0;
+    }
   }
   :root[data-theme="dark"]{
-    --ink:#ececec; --paper:#151515; --panel:#1e1e1e; --line:#3a3a3a; --line-soft:#2a2a2a;
-    --muted:#9a9691; --accent:#ececec; --tag-main:#4a4a4a; --tag-ohio:#6b6459; --tag-az:#5c6b52;
-    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.3);
+    --ground:#0f1216;
+    --surface:#171b21;
+    --surface-2:#1e242b;
+    --line:#2b323b;
+    --line-soft:#232a32;
+    --ink:#e6e9ed;
+    --ink-2:#c2c9d1;
+    --muted:#8b96a4;
+    --accent:#FF671C;
+    --accent-ink:#160b04;
+    --accent-wash:rgba(255,103,28,.14);
+    --accent-line:rgba(255,103,28,.5);
+    --tag-slb:#5d6873;
+    --tag-oh:#8a7750;
+    --tag-az:#5c7a64;
+    --focus:#58a6ff;
+    --logo-invert:0;
   }
 
   *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
+  html{ -webkit-text-size-adjust:100%; }
   body{
-    background:var(--paper);
+    margin:0;
+    background:var(--ground);
     color:var(--ink);
-    font-family:"Poppins",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    font-family:var(--sans);
+    font-size:14px;
+    line-height:1.45;
     -webkit-font-smoothing:antialiased;
+    padding-bottom:76px;
   }
-  ::selection{ background: var(--ink); color:var(--paper); }
-  a{color:inherit;}
+  :focus-visible{ outline:2px solid var(--focus); outline-offset:1px; }
+  button{ font-family:inherit; }
 
-  .shell{ display:flex; flex-direction:column; min-height:100vh; }
-
-  .hero{
-    position:relative;
-    padding:34px clamp(14px,3vw,32px) 30px;
-    color:#f2f4f6;
-    overflow:hidden;
-    background:linear-gradient(155deg, #050a12 0%, #0a1628 55%, #0d2040 100%);
-  }
-  .hero::before{
-    content:"";
-    position:absolute; inset:0; z-index:0;
-    background:
-      radial-gradient(900px 380px at 8% -25%, rgba(45,103,177,.38), transparent 60%),
-      radial-gradient(760px 340px at 96% 135%, rgba(255,103,28,.24), transparent 62%);
-    animation:heroGlow 9s ease-in-out infinite alternate;
-  }
-  @keyframes heroGlow{ from{ opacity:.7; } to{ opacity:1; } }
-  .hero-inner{ position:relative; z-index:1; animation:fadeSlideUp .5s ease both; }
-  .hero-logo{ height:34px; width:auto; display:block; margin-bottom:16px; }
-  .hero-title{
-    font-family:"Poppins","Georgia",serif;
-    font-weight:600; font-size:26px; letter-spacing:.2px;
-  }
-  .hero-sub{ font-size:13px; color:#c7cfd8; margin-top:5px; }
-
-  .controls-bar{
-    position:sticky; top:0; z-index:40;
-    background:var(--paper);
+  /* ---------- command bar ---------- */
+  .bar{
+    position:sticky; top:0; z-index:50;
+    background:var(--surface);
     border-bottom:1px solid var(--line);
-    padding:14px clamp(14px,3vw,32px) 14px;
+    padding:10px clamp(12px,2.2vw,22px);
+    display:flex; flex-direction:column; gap:9px;
   }
-  .controls-top{ display:flex; align-items:center; justify-content:flex-end; margin-bottom:10px; }
-  .theme-toggle{
-    background:none;border:1px solid var(--line);color:var(--muted);
-    font-family:inherit; font-size:11.5px; padding:6px 10px; border-radius:var(--radius); cursor:pointer;
-  }
-
-  .controls{ margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
-  .search-box{ position:relative; flex:1; min-width:220px; }
-  .search-box input{
-    width:100%; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
-    color:var(--ink); font-size:15px; padding:10px 12px 10px 34px; font-family:inherit;
-  }
-  .search-box input:focus{ outline:none; border-color:var(--ink); }
-  .search-box svg{ position:absolute; left:10px; top:50%; transform:translateY(-50%); width:15px;height:15px; color:var(--muted); }
-
-  select.filt{
-    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
-    color:var(--ink); font-family:inherit; font-size:13px; padding:9px 10px;
-  }
-
-  .chipbar{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
-  .chip{
-    background:var(--panel); border:1px solid var(--line); color:var(--ink);
-    font-family:inherit; font-size:12.5px; padding:6px 12px; border-radius:20px; cursor:pointer;
-    transition:transform .12s ease, border-color .15s ease, background .15s ease, color .15s ease;
-  }
-  .chip:hover{ border-color:#FF671C; }
-  .chip:active{ transform:scale(.95); }
-  .chip.active{ background:#FF671C; color:#1c0f06; border-color:#FF671C; }
-  .chip.addchip{ margin-left:auto; }
-
-  .chip-select{
-    background:var(--panel); border:1px solid var(--line); color:var(--ink);
-    font-family:inherit; font-size:12.5px; padding:6px 12px; border-radius:20px; cursor:pointer;
-    transition:border-color .15s ease, background .15s ease, color .15s ease;
-  }
-  .chip-select:hover{ border-color:#FF671C; }
-  .chip-select.active{ background:#FF671C; color:#1c0f06; border-color:#FF671C; }
-  .chip-select.active option{ color:#1a1a1a; }
-
-  .add-form{
-    margin-top:10px; padding:12px; border:1px dashed var(--line); border-radius:var(--radius);
-    background:var(--panel);
-  }
-  .add-form-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;
-  }
-  @media (max-width:720px){ .add-form-grid{ grid-template-columns:1fr 1fr; } }
-  .add-form-grid input, .add-form-grid select{
-    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
-    color:var(--ink); font-family:inherit; font-size:13px; padding:8px 10px;
-  }
-  .add-form-grid button{
-    background:#FF671C; color:#fff; border:1px solid #FF671C; font-weight:700;
-    font-family:inherit; font-size:13px; padding:8px 10px; border-radius:var(--radius); cursor:pointer;
-  }
-  .add-form-grid button:hover{ background:#e85c17; }
-  .add-form-note{ font-size:11.5px; color:var(--muted); margin-top:8px; }
-
-  /* ---- copy panel: the main event ---- */
-  .copy-panel{
-    margin:14px clamp(14px,3vw,32px) 0;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    background:var(--panel);
-    box-shadow:var(--shadow);
-  }
-  .copy-panel-head{
-    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-    padding:10px 14px; border-bottom:1px solid var(--line-soft);
-  }
-  .copy-panel-head .ttl{ font-size:13px; font-weight:600; }
-  .copy-panel-head .sub{ font-size:12px; color:var(--muted); }
-  .copy-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  select.fmt{
-    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
-    color:var(--ink); font-family:inherit; font-size:12.5px; padding:7px 9px;
-  }
-  button.copybtn{
-    background:#FF671C; color:#ffffff; border:1px solid #FF671C;
-    font-family:inherit; font-size:13px; font-weight:700; padding:8px 16px; border-radius:var(--radius); cursor:pointer;
-  }
-  button.copybtn:hover{ background:#e85c17; border-color:#e85c17; }
-  .copy-flash{ font-size:12px; color:var(--muted); }
-
-  textarea#copyText{
-    display:block; width:100%; box-sizing:border-box;
-    border:none; resize:vertical;
-    background:var(--panel); color:var(--ink);
-    font-family:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
-    font-size:12.5px; line-height:1.6;
-    padding:12px 14px;
-    height:190px;
-    border-radius:0 0 var(--radius) var(--radius);
-  }
-  textarea#copyText:focus{ outline:none; }
-  .copy-note{ padding:8px 14px 12px; font-size:11.5px; color:var(--muted); border-top:1px solid var(--line-soft); }
-
-  .ask-panel{
-    margin:10px clamp(14px,3vw,32px) 0;
-    border:1px solid var(--line);
-    border-radius:var(--radius);
-    background:var(--panel);
-    box-shadow:var(--shadow);
-  }
-  .ask-head{ padding:10px 14px 6px; }
-  .ask-head .ttl{ font-size:13px; font-weight:600; }
-  .ask-head .sub{ font-size:12px; color:var(--muted); margin-top:1px; }
-  .ask-row{ display:flex; gap:8px; padding:6px 14px 14px; flex-wrap:wrap; }
-  .ask-row input{
-    flex:1; min-width:200px;
-    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
-    color:var(--ink); font-family:inherit; font-size:13.5px; padding:9px 11px;
-  }
-  .ask-row input:focus{ outline:none; border-color:#FF671C; }
-  button.asksend{
-    background:#FF671C; color:#fff; border:1px solid #FF671C; font-weight:700;
-    font-family:inherit; font-size:13px; padding:9px 16px; border-radius:var(--radius); cursor:pointer;
-    transition:background .15s ease;
-  }
-  button.asksend:hover{ background:#e85c17; }
-  button.asksend:disabled{ opacity:.5; cursor:default; }
-  button.askstop{
-    background:none; color:var(--muted); border:1px solid var(--line); font-family:inherit;
-    font-size:13px; padding:9px 14px; border-radius:var(--radius); cursor:pointer;
-  }
-  button.askstop:hover{ border-color:#c15a5a; color:#c15a5a; }
-  .ask-answer{
-    margin:0 14px 14px; padding:12px 14px; border:1px solid var(--line-soft); border-radius:var(--radius);
-    background:var(--paper); font-size:13.5px; line-height:1.55; white-space:pre-wrap;
-  }
-  .ask-answer.error{ color:#c15a5a; }
-  .ask-answer .truncnote{ display:block; margin-top:8px; font-size:11.5px; color:var(--muted); }
-
-  /* ---- browse list: grouped by company, people underneath ---- */
-  main.results{ padding:16px clamp(14px,3vw,32px) 60px; }
-  .results-head{ display:flex; align-items:center; justify-content:space-between; margin:4px 0 10px; }
-  .results-head .count{ font-size:12.5px; color:var(--muted); }
-  .results-head .count .num{ font-variant-numeric:tabular-nums; font-weight:700; color:var(--ink); }
-
-  .results-list{ display:flex; flex-direction:column; gap:8px; }
-
-  @keyframes fadeSlideUp{ from{ opacity:0; transform:translateY(7px); } to{ opacity:1; transform:translateY(0); } }
-
-  .company-group{
-    border:1px solid var(--line); border-radius:var(--radius); background:var(--panel);
-    overflow:hidden; box-shadow:var(--shadow);
-    animation:fadeSlideUp .28s ease both;
-    transition:box-shadow .18s ease;
-  }
-  .company-group:hover{ box-shadow:0 2px 6px rgba(0,0,0,.10), 0 12px 26px rgba(0,0,0,.08); }
-
-  .company-head{
-    width:100%; display:flex; align-items:center; gap:6px;
-    background:var(--paper); padding:7px 8px 7px 14px;
-  }
-  .chead-toggle{
-    flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left;
-    background:none; border:none; cursor:pointer; padding:4px 4px; font-family:inherit; color:var(--ink);
-  }
-  .chead-toggle .chev{ font-size:10px; color:var(--muted); transition:transform .2s ease; flex:none; }
-  .company-group.collapsed .chev{ transform:rotate(-90deg); }
-  .chead-toggle .co-name{ font-weight:700; font-size:14.5px; }
-  .chead-toggle .co-count{
-    font-size:11px; color:var(--muted); background:var(--line-soft); padding:2px 9px; border-radius:20px;
-    font-variant-numeric:tabular-nums; flex:none;
-  }
-  .chead-copy{
-    flex:none; display:flex; align-items:center; gap:5px;
-    background:none; border:1px solid var(--line); color:var(--muted);
-    font-family:inherit; font-size:11px; padding:5px 10px; border-radius:20px; cursor:pointer;
-    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .12s ease;
+  .bar-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .brand{ display:flex; align-items:center; gap:11px; flex:none; }
+  .brand img{ height:22px; width:auto; display:block; filter:invert(var(--logo-invert)); }
+  .brand .rule{ width:1px; height:18px; background:var(--line); }
+  .brand .nm{
+    font-size:12px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; color:var(--muted);
     white-space:nowrap;
   }
-  .chead-copy:hover{ border-color:#FF671C; color:#FF671C; }
-  .chead-copy:active{ transform:scale(.95); }
-  .chead-copy.flashed{ background:#FF671C; border-color:#FF671C; color:#fff; }
+  .bar-spacer{ flex:1 1 60px; }
 
-  .company-people{ max-height:4000px; overflow:hidden; transition:max-height .3s ease; }
-  .company-group.collapsed .company-people{ max-height:0; }
+  .search{ position:relative; flex:1 1 300px; min-width:200px; }
+  .search svg{
+    position:absolute; left:10px; top:50%; transform:translateY(-50%);
+    width:15px; height:15px; color:var(--muted); pointer-events:none;
+  }
+  .search input{
+    width:100%; padding:8px 58px 8px 31px;
+    background:var(--ground); color:var(--ink);
+    border:1px solid var(--line); border-radius:6px;
+    font-family:inherit; font-size:14px;
+  }
+  .search input::placeholder{ color:var(--muted); }
+  .search input:focus{ outline:none; border-color:var(--accent-line); background:var(--surface); }
+  .search kbd{
+    position:absolute; right:8px; top:50%; transform:translateY(-50%);
+    font-family:var(--mono); font-size:10.5px; color:var(--muted);
+    border:1px solid var(--line); border-radius:4px; padding:1px 5px; background:var(--surface);
+  }
+  .search input:not(:placeholder-shown) ~ kbd{ display:none; }
 
-  .person-row{
-    display:flex; align-items:center; gap:12px;
-    padding:9px 14px 9px 30px; border-top:1px solid var(--line-soft);
-    position:relative;
-    transition:background .15s ease, padding-left .15s ease;
+  select.sel, button.btn{
+    background:var(--surface); color:var(--ink);
+    border:1px solid var(--line); border-radius:6px;
+    font-family:inherit; font-size:13px; padding:7px 10px; cursor:pointer;
   }
-  .person-row::before{
-    content:""; position:absolute; left:14px; top:50%; transform:translateY(-50%);
-    width:5px; height:5px; border-radius:50%; background:var(--line);
-    transition:background .15s ease, transform .15s ease;
+  select.sel{ max-width:210px; }
+  button.btn:hover, select.sel:hover{ border-color:var(--muted); }
+  button.btn[aria-pressed="true"]{ background:var(--accent-wash); border-color:var(--accent-line); color:var(--ink); }
+
+  .segs{ display:flex; gap:0; border:1px solid var(--line); border-radius:6px; overflow:hidden; flex:none; }
+  .segs button{
+    background:var(--surface); color:var(--muted); border:none; border-right:1px solid var(--line);
+    font-family:inherit; font-size:12.5px; font-weight:500; padding:7px 12px; cursor:pointer; white-space:nowrap;
   }
-  .person-row:hover{ background:var(--paper); padding-left:34px; }
-  .person-row:hover::before{ background:#FF671C; transform:translateY(-50%) scale(1.3); }
-  .person-main{ flex:1; min-width:0; }
-  .p-name{ font-weight:600; font-size:13.5px; }
-  .p-title{ color:var(--muted); font-size:12px; margin-top:1px; }
-  .person-contact{ text-align:right; font-size:12.5px; flex:none; }
-  .person-contact .em{ display:block; }
-  .person-contact .ph{ display:block; color:var(--muted); font-size:11.5px; margin-top:1px; font-variant-numeric:tabular-nums; }
-  .person-meta{ display:flex; align-items:center; gap:8px; flex:none; }
-  .person-copy{
-    flex:none; width:26px; height:26px; border-radius:50%;
-    background:none; border:1px solid transparent; color:var(--muted);
-    display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer;
-    opacity:0; transition:opacity .15s ease, border-color .15s ease, color .15s ease, background .15s ease, transform .12s ease;
+  .segs button:last-child{ border-right:none; }
+  .segs button:hover{ color:var(--ink); background:var(--surface-2); }
+  .segs button[aria-pressed="true"]{ background:var(--accent); color:var(--accent-ink); font-weight:600; }
+
+  .scope{
+    display:flex; align-items:baseline; gap:7px; flex-wrap:wrap;
+    font-size:12.5px; color:var(--muted);
   }
-  .person-row:hover .person-copy{ opacity:1; }
-  .person-copy:hover{ border-color:#FF671C; color:#FF671C; background:var(--panel); }
-  .person-copy:active{ transform:scale(.88); }
-  .person-copy.flashed{ opacity:1; background:#FF671C; border-color:#FF671C; color:#fff; }
-  .tag{ display:inline-block; font-size:10px; letter-spacing:.03em; padding:2px 6px; border-radius:2px; color:#fff; white-space:nowrap; flex:none; }
-  .tag.main{ background:var(--tag-main); }
-  .tag.ohio{ background:var(--tag-ohio); }
+  .scope .fig{ font-family:var(--mono); font-size:13px; font-weight:600; color:var(--ink); font-variant-numeric:tabular-nums; }
+  .scope .clear{
+    background:none; border:none; color:var(--accent); font-family:inherit; font-size:12.5px;
+    padding:0; cursor:pointer; text-decoration:underline; text-underline-offset:2px;
+  }
+
+  /* ---------- panels (ask / add / preview) ---------- */
+  .panel{
+    border:1px solid var(--line); border-radius:8px; background:var(--surface);
+    margin:10px clamp(12px,2.2vw,22px) 0; padding:12px 13px;
+  }
+  .panel h2{
+    margin:0 0 3px; font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--muted);
+  }
+  .panel .hint{ font-size:12.5px; color:var(--muted); margin:0 0 9px; }
+  .panel-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .panel-row input{
+    flex:1 1 220px; min-width:0;
+    background:var(--ground); color:var(--ink); border:1px solid var(--line); border-radius:6px;
+    font-family:inherit; font-size:13.5px; padding:8px 10px;
+  }
+  .panel-row input:focus{ outline:none; border-color:var(--accent-line); }
+  .grid-form{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .grid-form input, .grid-form select{
+    background:var(--ground); color:var(--ink); border:1px solid var(--line); border-radius:6px;
+    font-family:inherit; font-size:13px; padding:8px 10px; min-width:0;
+  }
+  .answer{
+    margin-top:10px; padding:11px 12px; border-radius:6px;
+    background:var(--ground); border:1px solid var(--line-soft);
+    font-size:13.5px; line-height:1.55; white-space:pre-wrap;
+  }
+  .answer.err{ color:#c25a4a; }
+  .note{ font-size:12px; color:var(--muted); margin-top:8px; }
+  .note.err{ color:#c25a4a; }
+  textarea#previewText{
+    width:100%; height:170px; resize:vertical; margin-top:8px;
+    background:var(--ground); color:var(--ink-2);
+    border:1px solid var(--line-soft); border-radius:6px; padding:10px 11px;
+    font-family:var(--mono); font-size:12px; line-height:1.55;
+  }
+  textarea#previewText:focus{ outline:none; border-color:var(--accent-line); }
+
+  button.go{
+    background:var(--accent); color:var(--accent-ink); border:1px solid var(--accent);
+    border-radius:6px; font-family:inherit; font-size:13px; font-weight:600;
+    padding:8px 16px; cursor:pointer; white-space:nowrap;
+  }
+  button.go:hover{ filter:brightness(1.06); }
+  button.go:disabled{ opacity:.45; cursor:default; filter:none; }
+
+  /* ---------- table ---------- */
+  .sheet{ margin:10px clamp(12px,2.2vw,22px) 0; }
+  .tablewrap{
+    border:1px solid var(--line); border-radius:8px; background:var(--surface); overflow:clip;
+  }
+  table{ width:100%; border-collapse:collapse; }
+  thead th{
+    position:sticky; top:var(--bar-h); z-index:20;
+    background:var(--surface-2);
+    border-bottom:1px solid var(--line);
+    font-size:10.5px; font-weight:600; letter-spacing:.085em; text-transform:uppercase; color:var(--muted);
+    text-align:left; padding:0; white-space:nowrap;
+  }
+  thead th button{
+    width:100%; display:flex; align-items:center; gap:5px;
+    background:none; border:none; color:inherit; font:inherit; letter-spacing:inherit; text-transform:inherit;
+    padding:9px 10px; cursor:pointer; text-align:left;
+  }
+  thead th button:hover{ color:var(--ink); }
+  thead th .arrow{ opacity:0; font-size:9px; }
+  thead th[aria-sort] button{ color:var(--ink); }
+  thead th[aria-sort] .arrow{ opacity:1; color:var(--accent); }
+  th.c-check, td.c-check{ width:36px; padding-left:12px; }
+  th.c-act, td.c-act{ width:38px; }
+
+  tbody td{
+    border-bottom:1px solid var(--line-soft);
+    padding:8px 10px; vertical-align:middle;
+    font-size:13px; color:var(--ink-2);
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  tbody tr:hover td{ background:var(--surface-2); }
+  tbody tr[data-on="1"] td{ background:var(--accent-wash); }
+  tbody tr[data-on="1"] td.c-check{ box-shadow:inset 2px 0 0 var(--accent); }
+
+  td.c-name{ color:var(--ink); font-weight:600; }
+  td.c-title{ color:var(--muted); font-size:12.5px; }
+  td.c-mono{ font-family:var(--mono); font-size:12px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  td.c-email{ font-family:var(--mono); font-size:12px; word-break:break-all; }
+  td.c-mkt{ font-family:var(--mono); font-size:12px; font-weight:500; letter-spacing:.04em; }
+  .firm{
+    background:none; border:none; padding:0; cursor:pointer; text-align:left;
+    font:inherit; color:var(--ink-2); border-bottom:1px dotted transparent;
+  }
+  .firm:hover{ color:var(--accent); border-bottom-color:var(--accent-line); }
+  .dash{ color:var(--muted); }
+
+  .tag{
+    display:inline-block; font-family:var(--mono); font-size:9.5px; font-weight:600; letter-spacing:.06em;
+    padding:2px 6px; border-radius:3px; color:#fff; white-space:nowrap;
+  }
+  .tag.slb{ background:var(--tag-slb); }
+  .tag.oh{ background:var(--tag-oh); }
   .tag.az{ background:var(--tag-az); }
 
-  .empty-state{ padding:50px 20px; text-align:center; color:var(--muted); font-size:13.5px; }
-  .load-more{ text-align:center; padding:12px; }
-  .load-more button{
-    background:var(--panel); border:1px solid var(--line); color:var(--ink);
-    font-family:inherit; font-size:12.5px; padding:8px 16px; border-radius:var(--radius); cursor:pointer;
-    transition:transform .12s ease, border-color .15s ease;
-  }
-  .load-more button:hover{ border-color:#FF671C; transform:translateY(-1px); }
-  .load-more button:active{ transform:translateY(0) scale(.97); }
+  input[type="checkbox"]{ width:15px; height:15px; accent-color:var(--accent); cursor:pointer; margin:0; display:block; }
 
-  @media (prefers-reduced-motion: reduce){
-    .company-group{ animation:none; }
-    .company-people, .person-row, .person-row::before, .chev, .chip, .load-more button, .person-copy{ transition:none; }
+  .rowcopy{
+    width:26px; height:26px; border-radius:5px; border:1px solid transparent; background:none;
+    color:var(--muted); font-size:13px; cursor:pointer; opacity:0; line-height:1;
   }
+  tr:hover .rowcopy, .rowcopy:focus-visible{ opacity:1; }
+  .rowcopy:hover{ border-color:var(--accent-line); color:var(--accent); }
+  .rowcopy[data-ok="1"]{ opacity:1; color:var(--accent); }
 
+  .sr{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+  .tfoot{ padding:12px; text-align:center; }
+  .empty{ padding:46px 20px; text-align:center; color:var(--muted); font-size:13.5px; }
+
+  /* ---------- action bar ---------- */
+  .actions{
+    position:fixed; left:0; right:0; bottom:0; z-index:60;
+    background:var(--surface); border-top:1px solid var(--line);
+    padding:10px clamp(12px,2.2vw,22px);
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    box-shadow:0 -1px 12px rgba(0,0,0,.06);
+  }
+  .actions .status{ flex:1 1 200px; font-size:13px; color:var(--muted); min-width:0; }
+  .actions .status b{ color:var(--ink); font-family:var(--mono); font-variant-numeric:tabular-nums; font-weight:600; }
+  .flash{ font-size:12.5px; color:var(--accent); font-weight:600; }
+
+  @media (max-width:820px){
+    .brand .nm, .search kbd{ display:none; }
+    td.c-title{ display:none; }
+    th.c-title{ display:none; }
+  }
   @media (max-width:640px){
-    .person-row{ flex-wrap:wrap; row-gap:4px; padding-top:10px; padding-bottom:10px; }
-    .person-main{ flex:1 1 100%; }
-    .person-contact{ text-align:left; flex:1 1 auto; }
-    .person-copy{ opacity:1; }
-    .person-meta{ flex:none; margin-left:auto; }
+    body{ padding-bottom:104px; }
+    thead{ display:none; }
+    table, tbody, tr, td{ display:block; width:100%; }
+    tbody tr{
+      position:relative; border-bottom:1px solid var(--line-soft);
+      padding:10px 44px 10px 38px;
+      display:grid; grid-template-columns:1fr auto; gap:2px 8px;
+    }
+    tbody tr:hover td{ background:none; }
+    tbody tr[data-on="1"]{ background:var(--accent-wash); box-shadow:inset 2px 0 0 var(--accent); }
+    tbody td{ border:none; padding:0; background:none !important; box-shadow:none !important; }
+    td.c-check{ position:absolute; left:12px; top:12px; width:auto; padding:0; }
+    td.c-name{ grid-area:1 / 1; font-size:14px; }
+    td.c-mkt{ grid-area:1 / 2; text-align:right; color:var(--muted); }
+    td.c-company{ grid-area:2 / 1 / 3 / 3; font-size:12.5px; }
+    td.c-mono{ grid-area:3 / 1; font-size:12px; }
+    td.c-list{ grid-area:3 / 2; text-align:right; }
+    td.c-email{ grid-area:4 / 1 / 5 / 3; font-size:12px; }
+    td.c-act{ position:absolute; right:8px; top:50%; transform:translateY(-50%); width:auto; }
+    .rowcopy{ opacity:1; }
+    .grid-form{ grid-template-columns:1fr 1fr; }
+    .actions .status{ flex:1 1 100%; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; animation:none !important; }
   }
 </style>
 
-<div class="shell">
+<header class="bar" id="commandBar">
+  <div class="bar-row">
+    <div class="brand">
+      <img src="assets/logo.png" alt="DWG Capital Group">
+      <span class="rule"></span>
+      <span class="nm">Broker Network</span>
+    </div>
 
-  <header class="hero" id="heroBanner">
-    <div class="hero-inner">
-      <img class="hero-logo" alt="DWG Capital Group" src="assets/logo.png">
-      <div class="hero-title">Broker Network</div>
-      <div class="hero-sub">National industrial sale-leaseback broker directory</div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="search" placeholder="Search name, firm, market, email, phone" autocomplete="off" aria-label="Search brokers">
+      <kbd>/</kbd>
     </div>
-  </header>
 
-  <div class="controls-bar">
-    <div class="controls-top">
-      <button class="theme-toggle" id="themeToggle" type="button">Theme</button>
+    <div class="segs" id="listSegs" role="group" aria-label="Contact list">
+      <button type="button" id="segAll" data-cat="all" aria-pressed="true">All</button>
+      <button type="button" id="segSlb" data-cat="main" aria-pressed="false">SLB</button>
+      <button type="button" id="segOh" data-cat="ohio" aria-pressed="false">Ohio</button>
+      <button type="button" id="segAz" data-cat="az" aria-pressed="false">Arizona</button>
     </div>
-    <div class="controls">
-      <div class="search-box">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="searchInput" type="text" placeholder="Search name, company, market, email, phone…" autocomplete="off">
-      </div>
-      <select class="filt" id="stateSelect">
-        <option value="">All Markets</option>
-      </select>
-    </div>
-    <div class="chipbar" id="catChips">
-      <button class="chip" data-cat="main" type="button">SLB Brokers</button>
-      <button class="chip active" data-cat="all" type="button">All Contacts</button>
-      <select class="chip-select" id="poolSelect">
-        <option value="">Tenant Rep Lists (by state) ▾</option>
-        <option value="ohio">Ohio</option>
-        <option value="az">Arizona</option>
-      </select>
-      <button class="chip addchip" id="addBrokerToggle" type="button" style="display:none;">+ Add Broker</button>
-    </div>
-    <div class="add-form" id="addForm" style="display:none;">
-      <div class="add-form-grid">
-        <input id="af_name" type="text" placeholder="Name *">
-        <input id="af_company" type="text" placeholder="Company">
-        <input id="af_title" type="text" placeholder="Position / Title">
-        <input id="af_phone" type="text" placeholder="Phone">
-        <input id="af_email" type="text" placeholder="Email">
-        <input id="af_state" type="text" placeholder="State (e.g. TX)" maxlength="2">
-        <select id="af_pool">
-          <option value="main">SLB Brokers</option>
-          <option value="ohio">Ohio Tenant Rep List</option>
-          <option value="az">Arizona Tenant Rep List</option>
-        </select>
-        <button id="af_save" type="button">Save Broker</button>
-      </div>
-      <div class="add-form-note" id="af_note">Saved here — visible to anyone who opens this page. No need to come back to chat.</div>
-    </div>
+
+    <select class="sel" id="marketSelect" aria-label="Market">
+      <option value="">All markets</option>
+    </select>
+
+    <div class="bar-spacer"></div>
+
+    <button class="btn" type="button" id="askToggle" aria-pressed="false" style="display:none;">Ask AI</button>
+    <button class="btn" type="button" id="addToggle" aria-pressed="false" style="display:none;">Add broker</button>
+    <button class="btn" type="button" id="themeToggle" aria-label="Switch theme">Theme</button>
   </div>
 
-  <div class="copy-panel">
-    <div class="copy-panel-head">
-      <div>
-        <div class="ttl" id="copyTitle">0 brokers match — copy the list below</div>
-        <div class="sub">Updates live as you search or filter. Select the box and Ctrl/Cmd+A, Ctrl/Cmd+C — or use the button.</div>
-      </div>
-      <div class="copy-actions">
-        <select class="fmt" id="fmtSelect">
-          <option value="table">Name · Company · Phone · Email</option>
-          <option value="email_semicolon">Emails only — semicolon separated</option>
-          <option value="email_comma">Emails only — comma separated</option>
-          <option value="csv">CSV</option>
-        </select>
-        <button class="copybtn" id="copyBtn" type="button">Copy List</button>
-        <span class="copy-flash" id="copyFlash"></span>
-      </div>
-    </div>
-    <textarea id="copyText" readonly spellcheck="false" onclick="this.select()"></textarea>
-    <div class="copy-note" id="copyNote"></div>
+  <div class="scope" id="scopeLine">
+    <span><span class="fig" id="scopeCount">0</span> <span id="scopeNoun">contacts</span></span>
+    <span id="scopeWhere"></span>
+    <button class="clear" type="button" id="resetBtn" style="display:none;">Reset filters</button>
   </div>
+</header>
 
-  <div class="ask-panel" id="askPanel" style="display:none;">
-    <div class="ask-head">
-      <div class="ttl">Ask AI about these brokers</div>
-      <div class="sub" id="askScope">Answers using the currently filtered list.</div>
-    </div>
-    <div class="ask-row">
-      <input id="askInput" type="text" placeholder="e.g. &quot;Who are my CBRE contacts in Arizona?&quot; or &quot;How many brokers at JLL?&quot;" autocomplete="off">
-      <button class="asksend" id="askSendBtn" type="button">Ask</button>
-      <button class="askstop" id="askStopBtn" type="button" style="display:none;">Stop</button>
-    </div>
-    <div class="ask-answer" id="askAnswer" style="display:none;"></div>
+<section class="panel" id="askPanel" style="display:none;">
+  <h2>Ask AI</h2>
+  <p class="hint" id="askScope">Answers from the contacts currently in view.</p>
+  <div class="panel-row">
+    <input id="askInput" type="text" placeholder="Who are my CBRE contacts in Arizona?" autocomplete="off">
+    <button class="go" type="button" id="askSend">Ask</button>
+    <button class="btn" type="button" id="askStop" style="display:none;">Stop</button>
   </div>
+  <div class="answer" id="askAnswer" style="display:none;"></div>
+</section>
 
-  <main class="results">
-    <div class="results-head">
-      <span class="count" id="resultsCount"></span>
-    </div>
-    <div class="results-list" id="resultsBody"></div>
-    <div class="empty-state" id="emptyState" style="display:none;">No brokers match that search.</div>
-    <div class="load-more" id="loadMoreWrap" style="display:none;">
-      <button id="loadMoreBtn" type="button">Show more companies</button>
-    </div>
-  </main>
+<section class="panel" id="addPanel" style="display:none;">
+  <h2>Add broker</h2>
+  <p class="hint">Saved to this page for everyone who opens it. No trip back to chat.</p>
+  <div class="grid-form">
+    <input id="afName" type="text" placeholder="Name">
+    <input id="afCompany" type="text" placeholder="Firm">
+    <input id="afTitle" type="text" placeholder="Title">
+    <input id="afPhone" type="text" placeholder="Phone">
+    <input id="afEmail" type="text" placeholder="Email">
+    <input id="afState" type="text" placeholder="Market (CA)" maxlength="2">
+    <select id="afPool">
+      <option value="main">SLB Brokers</option>
+      <option value="ohio">Ohio tenant rep</option>
+      <option value="az">Arizona tenant rep</option>
+    </select>
+    <button class="go" type="button" id="afSave">Save broker</button>
+  </div>
+  <div class="note" id="afNote"></div>
+</section>
 
+<section class="panel" id="previewPanel" style="display:none;">
+  <h2>Copy preview</h2>
+  <p class="hint" id="previewHint">Exactly what lands on your clipboard.</p>
+  <textarea id="previewText" readonly spellcheck="false" onclick="this.select()"></textarea>
+</section>
+
+<main class="sheet">
+  <div class="tablewrap">
+    <table id="grid">
+      <thead>
+        <tr>
+          <th class="c-check" scope="col"><input type="checkbox" id="selectAll" aria-label="Select all matching contacts"></th>
+          <th class="c-name" scope="col" data-key="n"><button type="button">Name <span class="arrow">&#9650;</span></button></th>
+          <th class="c-company" scope="col" data-key="c" aria-sort="ascending"><button type="button">Firm <span class="arrow">&#9650;</span></button></th>
+          <th class="c-title" scope="col" data-key="t"><button type="button">Title <span class="arrow">&#9650;</span></button></th>
+          <th class="c-mkt" scope="col" data-key="s"><button type="button">Mkt <span class="arrow">&#9650;</span></button></th>
+          <th class="c-mono" scope="col" data-key="p"><button type="button">Phone <span class="arrow">&#9650;</span></button></th>
+          <th class="c-email" scope="col" data-key="e"><button type="button">Email <span class="arrow">&#9650;</span></button></th>
+          <th class="c-list" scope="col" data-key="cat"><button type="button">List <span class="arrow">&#9650;</span></button></th>
+          <th class="c-act" scope="col"><span class="sr">Copy</span></th>
+        </tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <div class="empty" id="emptyState" style="display:none;">No contacts match that search.</div>
+    <div class="tfoot" id="moreWrap" style="display:none;">
+      <button class="btn" type="button" id="moreBtn">Show more</button>
+    </div>
+  </div>
+</main>
+
+<div class="actions">
+  <div class="status" id="statusLine">Loading contacts</div>
+  <button class="btn" type="button" id="previewToggle" aria-pressed="false">Preview</button>
+  <select class="sel" id="formatSelect" aria-label="Copy format">
+    <option value="table">Name · Firm · Phone · Email</option>
+    <option value="email_semicolon">Emails — semicolons</option>
+    <option value="email_comma">Emails — commas</option>
+    <option value="csv">CSV</option>
+  </select>
+  <button class="go" type="button" id="copyBtn">Copy</button>
+  <span class="flash" id="flash" role="status" aria-live="polite"></span>
 </div>
 
 <script src="brokers.js"></script>
@@ -423,474 +426,538 @@
 (function(){
   "use strict";
 
-  // Contact records live in brokers.js (one record per line) so the list can be
-  // edited, diffed and reviewed in the repo instead of inside this file.
-  var DATA = Array.isArray(window.DWG_BROKERS) ? window.DWG_BROKERS : [];
-  var DATA_LOAD_FAILED = !DATA.length;
-  DATA.forEach(function(r,i){ r.id = 'base_'+i; });
+  var $ = function(id){ return document.getElementById(id); };
 
-  var addedDocs = []; // live docs from db, merged in
-  var liveData = DATA;
-  var dbCol = null;
+  // ---- source data ---------------------------------------------------------
+  var RAW = Array.isArray(window.DWG_BROKERS) ? window.DWG_BROKERS : [];
+  var LOAD_FAILED = !RAW.length;
 
-  var state = { cat:'all', st:'', q:'', limit:60 };
-
-  function byId(id){ return document.getElementById(id); }
-
-  function rebuildLiveData(){
-    liveData = DATA.concat(addedDocs);
-  }
-
-  // ---- proper-case display helper (fixes ALL-CAPS source rows) ----
-  var CASE_KEEP = {LLC:1,INC:1,CBRE:1,SIOR:1,JLL:1,NAI:1,LLP:1,USA:1,III:1,II:1,IV:1,LP:1,PC:1,KW:1,RE:1,EVP:1,SVP:1,VP:1,CEO:1,CFO:1,COO:1,SF:1};
+  // Source lists arrive in mixed case, plenty of it SHOUTED. Fix once at load
+  // rather than on every render — 6,000 rows re-cased per keystroke is not free.
+  var KEEP = {LLC:1,INC:1,CBRE:1,SIOR:1,JLL:1,NAI:1,LLP:1,USA:1,III:1,II:1,IV:1,LP:1,PC:1,KW:1,RE:1,EVP:1,SVP:1,VP:1,CEO:1,CFO:1,COO:1,SF:1,IOS:1,SLB:1};
   function smartCase(s){
-    if(!s) return s;
-    return s.replace(/[A-Za-z']+/g, function(word){
-      if(word !== word.toUpperCase()) return word; // already has lowercase somewhere — leave it
-      var bare = word.replace(/'/g,'');
-      if(bare.length<=2) return word;
-      if(CASE_KEEP[bare]) return word;
-      return word.charAt(0)+word.slice(1).toLowerCase();
+    if(!s) return "";
+    return s.replace(/[A-Za-z']+/g, function(w){
+      if(w !== w.toUpperCase()) return w;
+      var bare = w.replace(/'/g,"");
+      if(bare.length <= 2 || KEEP[bare]) return w;
+      return w.charAt(0) + w.slice(1).toLowerCase();
     });
   }
 
-  function applyStoredTheme(){
-    try{
-      var t = localStorage.getItem('dwg_broker_theme');
-      if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme', t); }
-    }catch(e){}
+  function prep(r, id){
+    var n = smartCase(r.n || ""), c = smartCase(r.c || ""), t = smartCase(r.t || "");
+    var raw = (r.c || "").trim();
+    return {
+      id: id,
+      n: n, c: c, t: t,
+      e: r.e || "", p: r.p || "",
+      s: (r.s || "").toUpperCase(),
+      cat: r.cat || "main",
+      firm: (!raw || /^\(.*\)$/.test(raw)) ? "" : c,
+      hay: (n+" "+c+" "+(r.e||"")+" "+(r.p||"")+" "+t+" "+(r.s||"")+" "+(r.city||"")).toLowerCase()
+    };
   }
-  applyStoredTheme();
-  byId('themeToggle').addEventListener('click', function(){
-    var cur = document.documentElement.getAttribute('data-theme');
-    var next = cur==='dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try{ localStorage.setItem('dwg_broker_theme', next); }catch(e){}
+
+  var BASE = RAW.map(function(r,i){ return prep(r, "b"+i); });
+  var addedRows = [];
+  var ALL = BASE;
+
+  var MARKETS = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",DC:"Washington D.C."};
+  var LIST_LABEL = { main:"SLB brokers", ohio:"Ohio tenant rep", az:"Arizona tenant rep" };
+  var TAG = { main:["slb","SLB"], ohio:["oh","OH"], az:["az","AZ"] };
+
+  // ---- state ---------------------------------------------------------------
+  var state = { q:"", terms:[], cat:"all", mkt:"", firm:"", key:"c", dir:1 };
+  var picked = Object.create(null);
+  var pickedCount = 0;
+  var view = [];
+  var shown = 0;
+  var PAGE = 150;
+
+  // ---- theme ---------------------------------------------------------------
+  try{
+    var saved = localStorage.getItem("dwg_broker_theme");
+    if(saved === "light" || saved === "dark") document.documentElement.setAttribute("data-theme", saved);
+  }catch(e){}
+  $("themeToggle").addEventListener("click", function(){
+    var now = document.documentElement.getAttribute("data-theme");
+    if(!now){
+      now = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+    }
+    var next = now === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try{ localStorage.setItem("dwg_broker_theme", next); }catch(e){}
   });
 
-  var STATE_NAMES = {AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',DC:'D.C.'};
-
-  function populateStateSelect(){
-    var byState = {};
-    liveData.forEach(function(r){
-      if(state.cat!=='all' && r.cat!==state.cat) return;
-      var st = r.s || '—';
-      byState[st] = (byState[st]||0)+1;
-    });
-    var states = Object.keys(byState).filter(function(s){return s!=='—';}).sort(function(a,b){ return byState[b]-byState[a]; });
-    var html = '<option value="">All Markets</option>';
-    states.forEach(function(st){
-      var label = STATE_NAMES[st] ? (st+' — '+STATE_NAMES[st]) : st;
-      html += '<option value="'+st+'"'+(state.st===st?' selected':'')+'>'+label+' ('+byState[st]+')</option>';
-    });
-    if(byState['—']){
-      html += '<option value="—"'+(state.st==='—'?' selected':'')+'>Unspecified ('+byState['—']+')</option>';
-    }
-    byId('stateSelect').innerHTML = html;
+  // sticky table header has to clear the command bar, whose height changes with wrapping
+  function measureBar(){
+    document.documentElement.style.setProperty("--bar-h", $("commandBar").offsetHeight + "px");
   }
+  measureBar();
+  window.addEventListener("resize", measureBar);
 
+  // ---- filtering + sorting -------------------------------------------------
   function matches(r){
-    if(state.cat!=='all' && r.cat!==state.cat) return false;
-    if(state.st){
-      var st = r.s || '—';
-      if(st !== state.st) return false;
-    }
-    if(state.q){
-      var hay = (r.n+' '+r.c+' '+r.e+' '+r.p+' '+r.t+' '+r.s+' '+r.city).toLowerCase();
-      var terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
-      for(var i=0;i<terms.length;i++){ if(hay.indexOf(terms[i])===-1) return false; }
+    if(state.cat !== "all" && r.cat !== state.cat) return false;
+    if(state.mkt && (r.s || "—") !== state.mkt) return false;
+    if(state.firm && r.firm.toLowerCase() !== state.firm) return false;
+    for(var i=0;i<state.terms.length;i++){
+      if(r.hay.indexOf(state.terms[i]) === -1) return false;
     }
     return true;
   }
 
-  function escapeHtml(s){
-    return (s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+  function compare(a, b){
+    var k = state.key;
+    var av = (a[k] || ""), bv = (b[k] || "");
+    if(k === "cat"){ av = LIST_LABEL[av] || av; bv = LIST_LABEL[bv] || bv; }
+    // rows missing the sort field sink to the bottom in both directions
+    if(!av && bv) return 1;
+    if(av && !bv) return -1;
+    av = av.toLowerCase(); bv = bv.toLowerCase();
+    if(av < bv) return -state.dir;
+    if(av > bv) return state.dir;
+    if(k !== "n"){
+      var an = a.n.toLowerCase(), bn = b.n.toLowerCase();
+      if(an < bn) return -1;
+      if(an > bn) return 1;
+    }
+    return 0;
   }
 
-  function formatList(recs, fmt){
-    if(fmt==='email_semicolon'){ return recs.map(function(r){return r.e;}).filter(Boolean).join('; '); }
-    if(fmt==='email_comma'){ return recs.map(function(r){return r.e;}).filter(Boolean).join(', '); }
-    if(fmt==='csv'){
-      var lines = ['Name,Company,Position,Phone,Email,State'];
-      recs.forEach(function(r){
-        var row = [smartCase(r.n),smartCase(r.c),smartCase(r.t),r.p,r.e,r.s].map(function(v){ v=(v||'').replace(/"/g,'""'); return '"'+v+'"'; }).join(',');
-        lines.push(row);
-      });
-      return lines.join('\n');
+  function rebuild(){
+    view = ALL.filter(matches);
+    view.sort(compare);
+    shown = 0;
+    renderMarkets();
+    renderRows(true);
+    renderScope();
+    renderStatus();
+  }
+
+  // ---- rendering -----------------------------------------------------------
+  function esc(s){
+    return (s || "").replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  function renderMarkets(){
+    var counts = {}, pool = ALL.filter(function(r){ return state.cat === "all" || r.cat === state.cat; });
+    pool.forEach(function(r){ var k = r.s || "—"; counts[k] = (counts[k]||0)+1; });
+    var keys = Object.keys(counts).filter(function(k){ return k !== "—"; }).sort(function(a,b){ return counts[b]-counts[a]; });
+    var html = '<option value="">All markets</option>';
+    keys.forEach(function(k){
+      html += '<option value="'+k+'"'+(state.mkt===k?" selected":"")+'>'+k+' — '+esc(MARKETS[k]||k)+' ('+counts[k]+')</option>';
+    });
+    if(counts["—"]) html += '<option value="—"'+(state.mkt==="—"?" selected":"")+'>Market not listed ('+counts["—"]+')</option>';
+    $("marketSelect").innerHTML = html;
+  }
+
+  function rowHtml(r){
+    var tag = TAG[r.cat] || TAG.main;
+    var firmCell = r.firm
+      ? '<button class="firm" type="button" data-firm="'+esc(r.firm.toLowerCase())+'" title="Show everyone at '+esc(r.firm)+'">'+esc(r.firm)+'</button>'
+      : '<span class="dash">Independent</span>';
+    return '<tr data-id="'+r.id+'"'+(picked[r.id]?' data-on="1"':'')+'>'+
+      '<td class="c-check"><input type="checkbox" aria-label="Select '+esc(r.n)+'"'+(picked[r.id]?" checked":"")+'></td>'+
+      '<td class="c-name">'+esc(r.n)+'</td>'+
+      '<td class="c-company">'+firmCell+'</td>'+
+      '<td class="c-title">'+(r.t ? esc(r.t) : '<span class="dash">—</span>')+'</td>'+
+      '<td class="c-mkt">'+(r.s ? esc(r.s) : '<span class="dash">—</span>')+'</td>'+
+      '<td class="c-mono">'+(r.p ? esc(r.p) : '<span class="dash">—</span>')+'</td>'+
+      '<td class="c-email">'+(r.e ? esc(r.e) : '<span class="dash">—</span>')+'</td>'+
+      '<td class="c-list"><span class="tag '+tag[0]+'">'+tag[1]+'</span></td>'+
+      '<td class="c-act"><button class="rowcopy" type="button" title="Copy this contact">&#10697;</button></td>'+
+    '</tr>';
+  }
+
+  function renderRows(reset){
+    var body = $("rows");
+    if(reset){ body.innerHTML = ""; shown = 0; }
+    var next = view.slice(shown, shown + PAGE);
+    var html = "";
+    for(var i=0;i<next.length;i++) html += rowHtml(next[i]);
+    body.insertAdjacentHTML("beforeend", html);
+    shown += next.length;
+
+    $("emptyState").textContent = LOAD_FAILED
+      ? "Contact data did not load. Reload the page."
+      : "No contacts match that search.";
+    $("emptyState").style.display = view.length === 0 ? "block" : "none";
+    $("moreWrap").style.display = shown < view.length ? "block" : "none";
+    $("moreBtn").textContent = "Show " + Math.min(PAGE, view.length - shown).toLocaleString() + " more of " + (view.length - shown).toLocaleString();
+    syncSelectAll();
+  }
+
+  function renderScope(){
+    $("scopeCount").textContent = view.length.toLocaleString();
+    $("scopeNoun").textContent = view.length === 1 ? "contact" : "contacts";
+    var bits = [];
+    if(state.cat !== "all") bits.push(LIST_LABEL[state.cat]);
+    if(state.firm) bits.push("at " + (view.length ? view[0].firm : state.firm));
+    if(state.mkt) bits.push("in " + (state.mkt === "—" ? "unlisted markets" : (MARKETS[state.mkt] || state.mkt)));
+    if(state.q) bits.push('matching “' + state.q + '”');
+    $("scopeWhere").textContent = bits.length ? bits.join(" · ") : "across every list";
+    var filtered = !!(state.cat !== "all" || state.mkt || state.firm || state.q);
+    $("resetBtn").style.display = filtered ? "inline" : "none";
+  }
+
+  // What Copy actually puts on the clipboard. Selections made under an earlier
+  // filter can fall entirely out of view; copying nothing would be a silent
+  // failure, so an empty selection-in-view falls back to the whole view.
+  function selectedInView(){
+    if(!pickedCount) return [];
+    return view.filter(function(r){ return picked[r.id]; });
+  }
+  function targetRows(){
+    var sel = selectedInView();
+    return sel.length ? sel : view;
+  }
+
+  function renderStatus(){
+    var sel = selectedInView();
+    var fmt = $("formatSelect").value;
+    var noun = (fmt === "email_semicolon" || fmt === "email_comma") ? " — emails only" : "";
+    var msg, aside = "";
+    if(sel.length){
+      msg = "<b>" + sel.length.toLocaleString() + "</b> selected";
+      aside = sel.length < pickedCount
+        ? (pickedCount - sel.length).toLocaleString() + " more selected outside this filter"
+        : "clear the checkboxes to copy everything in view";
+    }else{
+      msg = "<b>" + view.length.toLocaleString() + "</b> in view";
+      if(pickedCount) aside = pickedCount.toLocaleString() + " selected, none in this filter";
     }
-    return recs.map(function(r){
-      var bits = [smartCase(r.n)];
-      if(r.t) bits.push(smartCase(r.t));
-      if(r.c) bits.push(smartCase(r.c));
+    $("statusLine").innerHTML = msg + " ready to copy" + noun +
+      (aside ? ' · <span style="color:var(--muted)">' + aside + "</span>" : "");
+    if($("previewPanel").style.display !== "none") renderPreview();
+  }
+
+  // ---- copy ----------------------------------------------------------------
+  function formatList(rows, fmt){
+    if(fmt === "email_semicolon") return rows.map(function(r){ return r.e; }).filter(Boolean).join("; ");
+    if(fmt === "email_comma") return rows.map(function(r){ return r.e; }).filter(Boolean).join(", ");
+    if(fmt === "csv"){
+      var out = ["Name,Firm,Title,Market,Phone,Email,List"];
+      rows.forEach(function(r){
+        out.push([r.n, r.firm, r.t, r.s, r.p, r.e, LIST_LABEL[r.cat] || r.cat].map(function(v){
+          return '"' + String(v || "").replace(/"/g, '""') + '"';
+        }).join(","));
+      });
+      return out.join("\n");
+    }
+    return rows.map(function(r){
+      var bits = [r.n];
+      if(r.t) bits.push(r.t);
+      if(r.firm) bits.push(r.firm);
       if(r.p) bits.push(r.p);
       if(r.e) bits.push(r.e);
-      return bits.join('  |  ');
-    }).join('\n');
+      return bits.join("  |  ");
+    }).join("\n");
   }
 
-  var collapsedGroups = {};
-  var lastCount = 0;
+  function toClipboard(text, done){
+    if(!text){ done(false); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ fallback(text, done); });
+    }else{
+      fallback(text, done);
+    }
+  }
+  function fallback(text, done){
+    try{
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed"; ta.style.top = "-1000px";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      done(ok);
+    }catch(err){ done(false); }
+  }
 
-  function animateCount(el, to){
-    var from = lastCount;
-    var start = null;
-    var dur = 320;
-    if(Math.abs(to-from) < 2 || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
-      el.textContent = to.toLocaleString();
+  function flash(msg){
+    var el = $("flash");
+    el.textContent = msg;
+    setTimeout(function(){ if(el.textContent === msg) el.textContent = ""; }, 2400);
+  }
+
+  $("copyBtn").addEventListener("click", function(){
+    var rows = targetRows();
+    var text = formatList(rows, $("formatSelect").value);
+    toClipboard(text, function(ok){
+      flash(ok ? "Copied " + rows.length.toLocaleString() + " contacts" : "Copy blocked — open Preview and copy from there");
+      if(!ok) openPreview(true);
+    });
+  });
+
+  function renderPreview(){
+    var rows = targetRows();
+    $("previewText").value = formatList(rows, $("formatSelect").value);
+    $("previewHint").textContent = "Exactly what lands on your clipboard — " + rows.length.toLocaleString() + " contacts.";
+  }
+  function openPreview(force){
+    var panel = $("previewPanel");
+    var open = force ? true : panel.style.display === "none";
+    panel.style.display = open ? "block" : "none";
+    $("previewToggle").setAttribute("aria-pressed", String(open));
+    if(open) renderPreview();
+    measureBar();
+  }
+  $("previewToggle").addEventListener("click", function(){ openPreview(false); });
+  $("formatSelect").addEventListener("change", renderStatus);
+
+  // ---- selection -----------------------------------------------------------
+  function setPicked(id, on){
+    if(on){ if(!picked[id]){ picked[id] = true; pickedCount++; } }
+    else if(picked[id]){ delete picked[id]; pickedCount--; }
+  }
+
+  function syncSelectAll(){
+    var box = $("selectAll");
+    var sel = selectedInView().length;
+    box.checked = view.length > 0 && sel === view.length;
+    box.indeterminate = sel > 0 && sel < view.length;
+  }
+
+  $("selectAll").addEventListener("change", function(){
+    var on = $("selectAll").checked;
+    view.forEach(function(r){ setPicked(r.id, on); });
+    Array.prototype.forEach.call($("rows").querySelectorAll("tr"), function(tr){
+      var id = tr.getAttribute("data-id");
+      tr.querySelector('input[type="checkbox"]').checked = !!picked[id];
+      if(picked[id]) tr.setAttribute("data-on","1"); else tr.removeAttribute("data-on");
+    });
+    renderStatus();
+    syncSelectAll();
+  });
+
+  $("rows").addEventListener("change", function(e){
+    var box = e.target;
+    if(box.type !== "checkbox") return;
+    var tr = box.closest("tr");
+    setPicked(tr.getAttribute("data-id"), box.checked);
+    if(box.checked) tr.setAttribute("data-on","1"); else tr.removeAttribute("data-on");
+    renderStatus();
+    syncSelectAll();
+  });
+
+  $("rows").addEventListener("click", function(e){
+    var firmBtn = e.target.closest(".firm");
+    if(firmBtn){
+      state.firm = firmBtn.getAttribute("data-firm");
+      rebuild();
+      window.scrollTo({ top:0, behavior:"smooth" });
       return;
     }
-    function step(ts){
-      if(start===null) start=ts;
-      var p = Math.min(1, (ts-start)/dur);
-      var eased = 1 - Math.pow(1-p, 3);
-      var val = Math.round(from + (to-from)*eased);
-      el.textContent = val.toLocaleString();
-      if(p<1) requestAnimationFrame(step);
+    var copyBtn = e.target.closest(".rowcopy");
+    if(copyBtn){
+      var id = copyBtn.closest("tr").getAttribute("data-id");
+      var rec = null;
+      for(var i=0;i<ALL.length;i++){ if(ALL[i].id === id){ rec = ALL[i]; break; } }
+      if(!rec) return;
+      toClipboard(formatList([rec], $("formatSelect").value), function(ok){
+        copyBtn.innerHTML = ok ? "&#10003;" : "&#10007;";
+        copyBtn.setAttribute("data-ok","1");
+        setTimeout(function(){ copyBtn.innerHTML = "&#10697;"; copyBtn.removeAttribute("data-ok"); }, 1400);
+      });
     }
-    requestAnimationFrame(step);
-  }
+  });
 
-  var currentFiltered = [];
-
-  function computeFilteredSorted(){
-    var filtered = liveData.filter(matches);
-    filtered.sort(function(a,b){
-      var ca=(a.c||'').toLowerCase(), cb=(b.c||'').toLowerCase();
-      if(ca<cb) return -1; if(ca>cb) return 1;
-      var na=(a.n||'').toLowerCase(), nb=(b.n||'').toLowerCase();
-      if(na<nb) return -1; if(na>nb) return 1;
-      return 0;
-    });
-    return filtered;
-  }
-
-  function render(){
-    populateStateSelect();
-    var filtered = computeFilteredSorted();
-    currentFiltered = filtered;
-
-    byId('copyTitle').textContent = filtered.length.toLocaleString()+' broker'+(filtered.length===1?'':'s')+' match — copy the list below';
-    var fmt = byId('fmtSelect').value;
-    byId('copyText').value = formatList(filtered, fmt);
-    byId('copyNote').textContent = filtered.length > 800 ? 'Large list — copy may take a moment to select.' : '';
-
-    var askScopeEl = byId('askScope');
-    if(askScopeEl){
-      askScopeEl.textContent = 'Answers using the currently filtered list — '+filtered.length.toLocaleString()+' contact'+(filtered.length===1?'':'s')+' right now. Narrow your search/filters above for a more specific answer.';
-    }
-
-    var countEl = byId('resultsCount');
-    countEl.innerHTML = '<span class="num" id="resultsNum">0</span> broker'+(filtered.length===1?'':'s')+' shown below, grouped by company — the box above always has the full matching list';
-    animateCount(byId('resultsNum'), filtered.length);
-    lastCount = filtered.length;
-
-    // group by company FIRST, across the entire filtered set (not a sliced
-    // page of it) so headcounts and the most-brokers-first ranking are
-    // always accurate — fold empty/placeholder "company" values (blank, or
-    // parenthetical notes like "(Capital Markets Broker)") into one bucket
-    var groups = [];
-    var byCompany = {};
-    var NO_CO_KEY = '\u0000no-company';
-    filtered.forEach(function(r){
-      var raw = (r.c || '').trim();
-      var isPlaceholder = !raw || /^\(.*\)$/.test(raw);
-      var key = isPlaceholder ? NO_CO_KEY : raw.toLowerCase();
-      if(!byCompany[key]){
-        byCompany[key] = { name: isPlaceholder ? 'No Company Listed' : smartCase(raw), people: [] };
-        groups.push(byCompany[key]);
-      }
-      byCompany[key].people.push(r);
-    });
-
-    groups.sort(function(a,b){
-      if(b.people.length !== a.people.length) return b.people.length - a.people.length;
-      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
-    });
-
-    var shownGroups = groups.slice(0, state.limit);
-
-    var html = shownGroups.map(function(g, idx){
-      var isCollapsed = !!collapsedGroups[g.name.toLowerCase()];
-      var peopleHtml = g.people.map(function(r, pidx){
-        var tagClass = r.cat==='ohio' ? 'ohio' : (r.cat==='az' ? 'az' : 'main');
-        var tagLabel = r.cat==='ohio' ? 'OH LEAD' : (r.cat==='az' ? 'AZ LEAD' : 'SLB');
-        var contact = '';
-        if(r.e){ contact += '<span class="em">'+escapeHtml(r.e)+'</span>'; }
-        if(r.p){ contact += '<span class="ph">'+escapeHtml(r.p)+'</span>'; }
-        return '<div class="person-row" data-pidx="'+pidx+'">'+
-          '<div class="person-main"><div class="p-name">'+escapeHtml(smartCase(r.n))+'</div>'+(r.t?'<div class="p-title">'+escapeHtml(smartCase(r.t))+'</div>':'')+'</div>'+
-          '<div class="person-contact">'+(contact||'<span style="color:var(--muted);">—</span>')+'</div>'+
-          '<div class="person-meta">'+
-            '<span class="tag '+tagClass+'">'+tagLabel+'</span>'+
-            '<button class="person-copy" type="button" title="Copy '+escapeHtml(smartCase(r.n))+'">⧉</button>'+
-          '</div>'+
-        '</div>';
-      }).join('');
-      return '<div class="company-group'+(isCollapsed?' collapsed':'')+'" data-idx="'+idx+'">'+
-        '<div class="company-head">'+
-          '<button class="chead-toggle" type="button">'+
-            '<span class="chev">▾</span>'+
-            '<span class="co-name">'+escapeHtml(g.name)+'</span>'+
-            '<span class="co-count">'+g.people.length+'</span>'+
-          '</button>'+
-          '<button class="chead-copy" type="button" title="Copy everyone at '+escapeHtml(g.name)+'">⧉ Copy</button>'+
-        '</div>'+
-        '<div class="company-people">'+peopleHtml+'</div>'+
-      '</div>';
-    }).join('');
-
-    byId('resultsBody').innerHTML = html;
-    byId('emptyState').textContent = DATA_LOAD_FAILED
-      ? 'Contact data failed to load (brokers.js). Reload the page.'
-      : 'No brokers match that search.';
-    byId('emptyState').style.display = filtered.length===0 ? 'block' : 'none';
-    byId('loadMoreWrap').style.display = groups.length > state.limit ? 'block' : 'none';
-
-    Array.prototype.forEach.call(document.querySelectorAll('.company-group'), function(groupEl){
-      var idx = parseInt(groupEl.getAttribute('data-idx'), 10);
-      var g = shownGroups[idx];
-      var toggleBtn = groupEl.querySelector('.chead-toggle');
-      var copyBtn = groupEl.querySelector('.chead-copy');
-      toggleBtn.addEventListener('click', function(){
-        var key = g.name.toLowerCase();
-        collapsedGroups[key] = !collapsedGroups[key];
-        groupEl.classList.toggle('collapsed', collapsedGroups[key]);
-      });
-      copyBtn.addEventListener('click', function(){
-        var text = formatList(g.people, byId('fmtSelect').value);
-        copyTextToClipboard(text, function(ok){
-          copyBtn.textContent = ok ? 'Copied ✓' : 'Failed';
-          copyBtn.classList.toggle('flashed', ok);
-          setTimeout(function(){
-            copyBtn.textContent = '⧉ Copy';
-            copyBtn.classList.remove('flashed');
-          }, 1600);
-        });
-      });
-      Array.prototype.forEach.call(groupEl.querySelectorAll('.person-row'), function(rowEl){
-        var pidx = parseInt(rowEl.getAttribute('data-pidx'), 10);
-        var person = g.people[pidx];
-        var pcopyBtn = rowEl.querySelector('.person-copy');
-        pcopyBtn.addEventListener('click', function(e){
-          e.stopPropagation();
-          var text = formatList([person], byId('fmtSelect').value);
-          copyTextToClipboard(text, function(ok){
-            pcopyBtn.textContent = ok ? '✓' : '✕';
-            pcopyBtn.classList.toggle('flashed', ok);
-            setTimeout(function(){
-              pcopyBtn.textContent = '⧉';
-              pcopyBtn.classList.remove('flashed');
-            }, 1400);
-          });
-        });
-      });
-    });
-  }
-
+  // ---- controls ------------------------------------------------------------
   var searchTimer;
-  byId('searchInput').addEventListener('input', function(){
+  $("searchInput").addEventListener("input", function(){
     clearTimeout(searchTimer);
-    var v = byId('searchInput').value;
-    searchTimer = setTimeout(function(){ state.q=v; state.limit=60; render(); }, 120);
+    var v = $("searchInput").value;
+    searchTimer = setTimeout(function(){
+      state.q = v.trim();
+      state.terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+      rebuild();
+    }, 110);
   });
-  Array.prototype.forEach.call(document.querySelectorAll('#catChips .chip[data-cat]'), function(btn){
-    btn.addEventListener('click', function(){
-      Array.prototype.forEach.call(document.querySelectorAll('#catChips .chip[data-cat]'), function(b){ b.classList.remove('active'); });
-      btn.classList.add('active');
-      byId('poolSelect').value = '';
-      byId('poolSelect').classList.remove('active');
-      state.cat = btn.getAttribute('data-cat');
-      state.st=''; state.limit=60; render();
-    });
-  });
-  byId('poolSelect').addEventListener('change', function(){
-    var v = byId('poolSelect').value;
-    if(!v){ return; } // placeholder re-selected — leave current filter as-is
-    Array.prototype.forEach.call(document.querySelectorAll('#catChips .chip[data-cat]'), function(b){ b.classList.remove('active'); });
-    byId('poolSelect').classList.add('active');
-    state.cat = v;
-    state.st=''; state.limit=60; render();
-  });
-  byId('stateSelect').addEventListener('change', function(){
-    state.st = byId('stateSelect').value; state.limit=60; render();
-  });
-  byId('fmtSelect').addEventListener('change', render);
-  byId('loadMoreBtn').addEventListener('click', function(){ state.limit += 60; render(); });
 
-  function copyTextToClipboard(text, onDone){
-    if(!text){ onDone(false); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){onDone(true);}).catch(function(){onDone(false);});
-    }else{
-      try{
-        var ta = document.createElement('textarea');
-        ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
-        document.body.appendChild(ta); ta.select();
-        document.execCommand('copy'); document.body.removeChild(ta);
-        onDone(true);
-      }catch(err){ onDone(false); }
+  document.addEventListener("keydown", function(e){
+    if(e.key === "/" && document.activeElement !== $("searchInput") && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)){
+      e.preventDefault();
+      $("searchInput").focus();
     }
-  }
+  });
 
-  byId('copyBtn').addEventListener('click', function(){
-    var text = byId('copyText').value;
-    var flash = byId('copyFlash');
-    copyTextToClipboard(text, function(ok){
-      flash.textContent = ok ? 'Copied ✓' : 'Copy failed — click the box and press Ctrl/Cmd+A, Ctrl/Cmd+C';
-      setTimeout(function(){flash.textContent='';},2200);
+  Array.prototype.forEach.call($("listSegs").querySelectorAll("button"), function(btn){
+    btn.addEventListener("click", function(){
+      Array.prototype.forEach.call($("listSegs").querySelectorAll("button"), function(b){ b.setAttribute("aria-pressed","false"); });
+      btn.setAttribute("aria-pressed","true");
+      state.cat = btn.getAttribute("data-cat");
+      state.mkt = ""; state.firm = "";
+      rebuild();
     });
   });
 
-  // ---- live "Add Broker" via the db capability, so new brokers don't require a trip back to chat ----
-  byId('addBrokerToggle').addEventListener('click', function(){
-    var f = byId('addForm');
-    f.style.display = f.style.display==='none' ? 'block' : 'none';
+  $("marketSelect").addEventListener("change", function(){
+    state.mkt = $("marketSelect").value;
+    rebuild();
   });
 
-  function saveNewBroker(){
-    var name = byId('af_name').value.trim();
-    var email = byId('af_email').value.trim();
-    var phone = byId('af_phone').value.trim();
-    var note = byId('af_note');
-    if(!name){ note.textContent = 'Name is required.'; note.style.color = '#c15a5a'; return; }
-    if(!email && !phone){ note.textContent = 'Add a phone or email so this is reachable.'; note.style.color = '#c15a5a'; return; }
-    if(!dbCol){ note.textContent = 'Live save unavailable in this view — the artifact needs to be open on claude.ai.'; note.style.color = '#c15a5a'; return; }
-    var rec = {
-      n: name,
-      c: byId('af_company').value.trim(),
-      t: byId('af_title').value.trim(),
-      p: phone,
-      e: email,
-      s: byId('af_state').value.trim().toUpperCase(),
-      city: '',
-      src: 'Added on the page',
-      cat: byId('af_pool').value
-    };
-    note.textContent = 'Saving…'; note.style.color = '';
-    dbCol.add(rec).then(function(){
-      note.textContent = 'Saved — visible to anyone who opens this page.'; note.style.color = '';
-      byId('af_name').value=''; byId('af_company').value=''; byId('af_title').value='';
-      byId('af_phone').value=''; byId('af_email').value=''; byId('af_state').value='';
-      setTimeout(function(){ note.textContent = 'Saved here — visible to anyone who opens this page. No need to come back to chat.'; }, 2500);
-    }).catch(function(err){
-      note.textContent = 'Save failed: '+(err && err.message ? err.message : 'unknown error');
-      note.style.color = '#c15a5a';
+  $("resetBtn").addEventListener("click", function(){
+    state.q = ""; state.terms = []; state.cat = "all"; state.mkt = ""; state.firm = "";
+    $("searchInput").value = "";
+    Array.prototype.forEach.call($("listSegs").querySelectorAll("button"), function(b){
+      b.setAttribute("aria-pressed", b.getAttribute("data-cat") === "all" ? "true" : "false");
     });
+    rebuild();
+  });
+
+  $("moreBtn").addEventListener("click", function(){ renderRows(false); });
+
+  Array.prototype.forEach.call(document.querySelectorAll("thead th[data-key]"), function(th){
+    th.querySelector("button").addEventListener("click", function(){
+      var key = th.getAttribute("data-key");
+      if(state.key === key){ state.dir = -state.dir; }
+      else { state.key = key; state.dir = 1; }
+      Array.prototype.forEach.call(document.querySelectorAll("thead th[data-key]"), function(o){ o.removeAttribute("aria-sort"); });
+      th.setAttribute("aria-sort", state.dir === 1 ? "ascending" : "descending");
+      th.querySelector(".arrow").innerHTML = state.dir === 1 ? "&#9650;" : "&#9660;";
+      rebuild();
+    });
+  });
+
+  // ---- live additions (db capability) --------------------------------------
+  var dbCol = null;
+
+  function afNote(msg, bad){
+    var el = $("afNote");
+    el.textContent = msg || "";
+    el.className = bad ? "note err" : "note";
   }
-  byId('af_save').addEventListener('click', saveNewBroker);
+
+  $("addToggle").addEventListener("click", function(){
+    var open = $("addPanel").style.display === "none";
+    $("addPanel").style.display = open ? "block" : "none";
+    $("addToggle").setAttribute("aria-pressed", String(open));
+    if(open) $("afName").focus();
+    measureBar();
+  });
+
+  $("afSave").addEventListener("click", function(){
+    var name = $("afName").value.trim();
+    var email = $("afEmail").value.trim();
+    var phone = $("afPhone").value.trim();
+    if(!name){ afNote("Add a name.", true); return; }
+    if(!email && !phone){ afNote("Add a phone or an email so the contact is reachable.", true); return; }
+    if(!dbCol){ afNote("Saving needs the page open on claude.ai.", true); return; }
+    afNote("Saving…");
+    dbCol.add({
+      n:name, c:$("afCompany").value.trim(), t:$("afTitle").value.trim(),
+      p:phone, e:email, s:$("afState").value.trim().toUpperCase(),
+      city:"", src:"Added on the page", cat:$("afPool").value
+    }).then(function(){
+      afNote("Saved. Everyone who opens this page sees it.");
+      ["afName","afCompany","afTitle","afPhone","afEmail","afState"].forEach(function(id){ $(id).value = ""; });
+    }, function(err){
+      afNote("Save failed: " + ((err && err.message) || "unknown error"), true);
+    });
+  });
 
   function initDb(){
-    if(!(window.claude && window.claude.use)) return; // not running inside a claude.ai viewer
-    window.claude.use('db').then(function(db){
-      if(!db) return; // capability unavailable in this view
-      dbCol = db.collection('added_brokers');
-      byId('addBrokerToggle').style.display = 'inline-block';
+    if(!(window.claude && window.claude.use)) return;
+    window.claude.use("db").then(function(db){
+      if(!db) return;
+      dbCol = db.collection("added_brokers");
+      $("addToggle").style.display = "inline-block";
+      measureBar();
       dbCol.onSnapshot(function(snap){
-        addedDocs = snap.docs.map(function(d){
-          var data = d.data() || {};
-          data.id = 'added_'+d.id;
-          return data;
-        });
-        rebuildLiveData();
-        render();
-      }, function(err){
-        console.error('db subscribe error', err);
-      });
-    }).catch(function(){ /* db not available */ });
+        addedRows = snap.docs.map(function(d){ return prep(d.data() || {}, "a"+d.id); });
+        ALL = BASE.concat(addedRows);
+        rebuild();
+      }, function(err){ console.error("db subscribe", err); });
+    }, function(){});
   }
-  initDb();
 
-  // ---- "Ask AI" — answers questions grounded in whatever is currently filtered ----
-  var sampleFn = null;
-  var askAbortCtl = null;
+  // ---- Ask AI (sample capability) ------------------------------------------
+  var sampleFn = null, askAbort = null;
 
-  function buildAskContext(){
-    // Cap to a safe byte budget (sample() allows ~64KB total input; leave
-    // most of that for the data, a slice for instructions+question).
-    var BUDGET = 45000;
-    var lines = [];
-    var used = 0;
-    var truncated = false;
-    for(var i=0;i<currentFiltered.length;i++){
-      var r = currentFiltered[i];
-      var line = smartCase(r.n)+' | '+(smartCase(r.c)||'—')+' | '+(smartCase(r.t)||'')+' | '+(r.p||'')+' | '+(r.e||'')+' | '+(r.s||'')+' | '+(r.cat==='ohio'?'Ohio Tenant Rep':r.cat==='az'?'Arizona Tenant Rep':'SLB Broker');
+  $("askToggle").addEventListener("click", function(){
+    var open = $("askPanel").style.display === "none";
+    $("askPanel").style.display = open ? "block" : "none";
+    $("askToggle").setAttribute("aria-pressed", String(open));
+    if(open) $("askInput").focus();
+    measureBar();
+  });
+
+  function askContext(){
+    var rows = targetRows();
+    var BUDGET = 45000, used = 0, lines = [], cut = false;
+    for(var i=0;i<rows.length;i++){
+      var r = rows[i];
+      var line = r.n+" | "+(r.firm||"—")+" | "+r.t+" | "+r.p+" | "+r.e+" | "+r.s+" | "+(LIST_LABEL[r.cat]||r.cat);
       used += line.length + 1;
-      if(used > BUDGET){ truncated = true; break; }
+      if(used > BUDGET){ cut = true; break; }
       lines.push(line);
     }
-    return { text: lines.join('\n'), included: lines.length, total: currentFiltered.length, truncated: truncated };
-  }
-
-  function setAskBusy(busy){
-    byId('askSendBtn').disabled = busy;
-    byId('askStopBtn').style.display = busy ? 'inline-block' : 'none';
+    return { text:lines.join("\n"), included:lines.length, total:rows.length, cut:cut };
   }
 
   function runAsk(){
-    var q = byId('askInput').value.trim();
+    var q = $("askInput").value.trim();
     if(!q || !sampleFn) return;
-    var answerEl = byId('askAnswer');
-    answerEl.style.display = 'block';
-    answerEl.classList.remove('error');
-    answerEl.textContent = 'Thinking…';
-    setAskBusy(true);
+    var out = $("askAnswer");
+    out.style.display = "block";
+    out.className = "answer";
+    out.textContent = "Working…";
+    $("askSend").disabled = true;
+    $("askStop").style.display = "inline-block";
 
-    var ctx = buildAskContext();
+    var ctx = askContext();
     var prompt =
-      'You are answering a question about a broker/lead contact list for a commercial real estate firm (DWG Capital Partners). '+
-      'Use ONLY the data below — never invent a name, company, phone, or email that is not present. '+
-      'If the data does not contain the answer, say so plainly. Be concise — short prose or a short list, no headers.\n\n'+
-      'DATA (one contact per line: Name | Company | Title | Phone | Email | State | List) — '+ctx.included+' of '+ctx.total+' currently-filtered contacts'+(ctx.truncated?' (list truncated to fit — mention counts may be incomplete if the question is about totals)':'')+':\n'+
-      ctx.text+'\n\n'+
-      'QUESTION: '+q;
+      "You are answering a question about a broker contact list for DWG Capital Partners, an industrial real estate investment firm. " +
+      "Use ONLY the data below. Never invent a name, firm, phone or email. If the data does not answer the question, say so plainly. " +
+      "Be concise — short prose or a short list, no headers.\n\n" +
+      "DATA (Name | Firm | Title | Phone | Email | Market | List) — " + ctx.included + " of " + ctx.total + " contacts in view" +
+      (ctx.cut ? " (truncated to fit, so totals may be incomplete)" : "") + ":\n" +
+      ctx.text + "\n\nQUESTION: " + q;
 
-    askAbortCtl = new AbortController();
+    askAbort = new AbortController();
     sampleFn(prompt, {
-      modelTier: 'quick',
-      signal: askAbortCtl.signal,
-      onText: function(u){ answerEl.textContent = u.text; }
-    }).then(function(res){
-      setAskBusy(false);
-      if(res.truncated){
-        var note = document.createElement('span');
-        note.className = 'truncnote';
-        note.textContent = 'Answer was cut short.';
-        answerEl.appendChild(note);
-      }
-    }).catch(function(err){
-      setAskBusy(false);
-      if(err && err.code === 'cancelled') return;
-      answerEl.classList.add('error');
-      var msg = {
-        not_granted: 'Ask AI needs your permission — try again and allow it when prompted.',
-        rate_limited: 'Too many requests right now — try again in a moment.',
-        session_expired: 'Your session expired — refresh the page and sign in again.',
-        refused: 'That question couldn\'t be answered — try rephrasing it.',
-        empty_completion: 'No answer came back — try rephrasing the question.',
-        prompt_too_large: 'Too much data for one question — narrow your filters first.'
-      }[err && err.code] || 'Something went wrong — try again.';
-      answerEl.textContent = (err && err.text) ? err.text : msg;
+      modelTier:"quick",
+      signal:askAbort.signal,
+      onText:function(u){ out.textContent = u.text; }
+    }).then(function(){
+      $("askSend").disabled = false;
+      $("askStop").style.display = "none";
+    }, function(err){
+      $("askSend").disabled = false;
+      $("askStop").style.display = "none";
+      if(err && err.code === "cancelled") return;
+      out.className = "answer err";
+      out.textContent = (err && err.text) || ({
+        not_granted:"Ask AI needs your permission — try again and allow it.",
+        rate_limited:"Too many requests. Try again in a moment.",
+        session_expired:"Session expired. Refresh the page.",
+        prompt_too_large:"Too many contacts for one question — narrow the filters first."
+      }[err && err.code] || "That did not go through. Try again.");
     });
   }
 
+  $("askSend").addEventListener("click", runAsk);
+  $("askInput").addEventListener("keydown", function(e){ if(e.key === "Enter") runAsk(); });
+  $("askStop").addEventListener("click", function(){ if(askAbort) askAbort.abort(); });
+
   function initSample(){
     if(!(window.claude && window.claude.use)) return;
-    window.claude.use('sample').then(function(fn){
-      if(!fn) return; // unavailable in this view
+    window.claude.use("sample").then(function(fn){
+      if(!fn) return;
       sampleFn = fn;
-      byId('askPanel').style.display = 'block';
-    }).catch(function(){ /* unavailable */ });
+      $("askToggle").style.display = "inline-block";
+      measureBar();
+    }, function(){});
   }
+
+  // ---- go ------------------------------------------------------------------
+  rebuild();
+  initDb();
   initSample();
-
-  byId('askSendBtn').addEventListener('click', runAsk);
-  byId('askInput').addEventListener('keydown', function(e){
-    if(e.key === 'Enter'){ runAsk(); }
-  });
-  byId('askStopBtn').addEventListener('click', function(){
-    if(askAbortCtl) askAbortCtl.abort();
-  });
-
-  render();
 })();
 </script>

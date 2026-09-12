@@ -7,6 +7,19 @@ Editable source for the published Broker Network directory.
 The artifact was originally published as one 1.4MB single-file page. That file is
 now split so it can be edited, diffed, and reviewed here.
 
+## Layout
+
+A single working surface built for one job: filter, select, copy, send.
+
+- **Command bar** — search (`/` focuses it), list segments, market filter, live count
+- **Table** — sortable on every column, row checkboxes, click any firm name to pull
+  everyone at that shop, per-row copy button
+- **Action bar** — always states what Copy will put on the clipboard: the selection
+  when there is one, otherwise everything in view
+
+Copy is clipboard-only in all four formats including CSV. The artifact sandbox
+blocks file downloads, so an Export button would be a dead control.
+
 ## Files
 
 ```
