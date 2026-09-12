@@ -1,0 +1,896 @@
+<title>DWG Broker Network</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1a1a1a;
+    --paper:#f7f6f4;
+    --panel:#ffffff;
+    --line:#d8d5cf;
+    --line-soft:#e9e7e2;
+    --muted:#6f6b64;
+    --accent:#1a1a1a;
+    --tag-main:#3a3a3a;
+    --tag-ohio:#8a8478;
+    --tag-az:#5f6b57;
+    --radius:3px;
+    --shadow: 0 1px 2px rgba(0,0,0,.05), 0 6px 18px rgba(0,0,0,.05);
+  }
+  :root:not([data-theme="light"]){
+    --ink:#ececec;
+    --paper:#151515;
+    --panel:#1e1e1e;
+    --line:#3a3a3a;
+    --line-soft:#2a2a2a;
+    --muted:#9a9691;
+    --accent:#ececec;
+    --tag-main:#4a4a4a;
+    --tag-ohio:#6b6459;
+    --tag-az:#5c6b52;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.3);
+  }
+  :root[data-theme="dark"]{
+    --ink:#ececec; --paper:#151515; --panel:#1e1e1e; --line:#3a3a3a; --line-soft:#2a2a2a;
+    --muted:#9a9691; --accent:#ececec; --tag-main:#4a4a4a; --tag-ohio:#6b6459; --tag-az:#5c6b52;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 18px rgba(0,0,0,.3);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Poppins",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background: var(--ink); color:var(--paper); }
+  a{color:inherit;}
+
+  .shell{ display:flex; flex-direction:column; min-height:100vh; }
+
+  .hero{
+    position:relative;
+    padding:34px clamp(14px,3vw,32px) 30px;
+    color:#f2f4f6;
+    overflow:hidden;
+    background:linear-gradient(155deg, #050a12 0%, #0a1628 55%, #0d2040 100%);
+  }
+  .hero::before{
+    content:"";
+    position:absolute; inset:0; z-index:0;
+    background:
+      radial-gradient(900px 380px at 8% -25%, rgba(45,103,177,.38), transparent 60%),
+      radial-gradient(760px 340px at 96% 135%, rgba(255,103,28,.24), transparent 62%);
+    animation:heroGlow 9s ease-in-out infinite alternate;
+  }
+  @keyframes heroGlow{ from{ opacity:.7; } to{ opacity:1; } }
+  .hero-inner{ position:relative; z-index:1; animation:fadeSlideUp .5s ease both; }
+  .hero-logo{ height:34px; width:auto; display:block; margin-bottom:16px; }
+  .hero-title{
+    font-family:"Poppins","Georgia",serif;
+    font-weight:600; font-size:26px; letter-spacing:.2px;
+  }
+  .hero-sub{ font-size:13px; color:#c7cfd8; margin-top:5px; }
+
+  .controls-bar{
+    position:sticky; top:0; z-index:40;
+    background:var(--paper);
+    border-bottom:1px solid var(--line);
+    padding:14px clamp(14px,3vw,32px) 14px;
+  }
+  .controls-top{ display:flex; align-items:center; justify-content:flex-end; margin-bottom:10px; }
+  .theme-toggle{
+    background:none;border:1px solid var(--line);color:var(--muted);
+    font-family:inherit; font-size:11.5px; padding:6px 10px; border-radius:var(--radius); cursor:pointer;
+  }
+
+  .controls{ margin-top:14px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .search-box{ position:relative; flex:1; min-width:220px; }
+  .search-box input{
+    width:100%; background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    color:var(--ink); font-size:15px; padding:10px 12px 10px 34px; font-family:inherit;
+  }
+  .search-box input:focus{ outline:none; border-color:var(--ink); }
+  .search-box svg{ position:absolute; left:10px; top:50%; transform:translateY(-50%); width:15px;height:15px; color:var(--muted); }
+
+  select.filt{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    color:var(--ink); font-family:inherit; font-size:13px; padding:9px 10px;
+  }
+
+  .chipbar{ display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+  .chip{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    font-family:inherit; font-size:12.5px; padding:6px 12px; border-radius:20px; cursor:pointer;
+    transition:transform .12s ease, border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .chip:hover{ border-color:#FF671C; }
+  .chip:active{ transform:scale(.95); }
+  .chip.active{ background:#FF671C; color:#1c0f06; border-color:#FF671C; }
+  .chip.addchip{ margin-left:auto; }
+
+  .chip-select{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    font-family:inherit; font-size:12.5px; padding:6px 12px; border-radius:20px; cursor:pointer;
+    transition:border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  .chip-select:hover{ border-color:#FF671C; }
+  .chip-select.active{ background:#FF671C; color:#1c0f06; border-color:#FF671C; }
+  .chip-select.active option{ color:#1a1a1a; }
+
+  .add-form{
+    margin-top:10px; padding:12px; border:1px dashed var(--line); border-radius:var(--radius);
+    background:var(--panel);
+  }
+  .add-form-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;
+  }
+  @media (max-width:720px){ .add-form-grid{ grid-template-columns:1fr 1fr; } }
+  .add-form-grid input, .add-form-grid select{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    color:var(--ink); font-family:inherit; font-size:13px; padding:8px 10px;
+  }
+  .add-form-grid button{
+    background:#FF671C; color:#fff; border:1px solid #FF671C; font-weight:700;
+    font-family:inherit; font-size:13px; padding:8px 10px; border-radius:var(--radius); cursor:pointer;
+  }
+  .add-form-grid button:hover{ background:#e85c17; }
+  .add-form-note{ font-size:11.5px; color:var(--muted); margin-top:8px; }
+
+  /* ---- copy panel: the main event ---- */
+  .copy-panel{
+    margin:14px clamp(14px,3vw,32px) 0;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel);
+    box-shadow:var(--shadow);
+  }
+  .copy-panel-head{
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    padding:10px 14px; border-bottom:1px solid var(--line-soft);
+  }
+  .copy-panel-head .ttl{ font-size:13px; font-weight:600; }
+  .copy-panel-head .sub{ font-size:12px; color:var(--muted); }
+  .copy-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  select.fmt{
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    color:var(--ink); font-family:inherit; font-size:12.5px; padding:7px 9px;
+  }
+  button.copybtn{
+    background:#FF671C; color:#ffffff; border:1px solid #FF671C;
+    font-family:inherit; font-size:13px; font-weight:700; padding:8px 16px; border-radius:var(--radius); cursor:pointer;
+  }
+  button.copybtn:hover{ background:#e85c17; border-color:#e85c17; }
+  .copy-flash{ font-size:12px; color:var(--muted); }
+
+  textarea#copyText{
+    display:block; width:100%; box-sizing:border-box;
+    border:none; resize:vertical;
+    background:var(--panel); color:var(--ink);
+    font-family:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    font-size:12.5px; line-height:1.6;
+    padding:12px 14px;
+    height:190px;
+    border-radius:0 0 var(--radius) var(--radius);
+  }
+  textarea#copyText:focus{ outline:none; }
+  .copy-note{ padding:8px 14px 12px; font-size:11.5px; color:var(--muted); border-top:1px solid var(--line-soft); }
+
+  .ask-panel{
+    margin:10px clamp(14px,3vw,32px) 0;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel);
+    box-shadow:var(--shadow);
+  }
+  .ask-head{ padding:10px 14px 6px; }
+  .ask-head .ttl{ font-size:13px; font-weight:600; }
+  .ask-head .sub{ font-size:12px; color:var(--muted); margin-top:1px; }
+  .ask-row{ display:flex; gap:8px; padding:6px 14px 14px; flex-wrap:wrap; }
+  .ask-row input{
+    flex:1; min-width:200px;
+    background:var(--paper); border:1px solid var(--line); border-radius:var(--radius);
+    color:var(--ink); font-family:inherit; font-size:13.5px; padding:9px 11px;
+  }
+  .ask-row input:focus{ outline:none; border-color:#FF671C; }
+  button.asksend{
+    background:#FF671C; color:#fff; border:1px solid #FF671C; font-weight:700;
+    font-family:inherit; font-size:13px; padding:9px 16px; border-radius:var(--radius); cursor:pointer;
+    transition:background .15s ease;
+  }
+  button.asksend:hover{ background:#e85c17; }
+  button.asksend:disabled{ opacity:.5; cursor:default; }
+  button.askstop{
+    background:none; color:var(--muted); border:1px solid var(--line); font-family:inherit;
+    font-size:13px; padding:9px 14px; border-radius:var(--radius); cursor:pointer;
+  }
+  button.askstop:hover{ border-color:#c15a5a; color:#c15a5a; }
+  .ask-answer{
+    margin:0 14px 14px; padding:12px 14px; border:1px solid var(--line-soft); border-radius:var(--radius);
+    background:var(--paper); font-size:13.5px; line-height:1.55; white-space:pre-wrap;
+  }
+  .ask-answer.error{ color:#c15a5a; }
+  .ask-answer .truncnote{ display:block; margin-top:8px; font-size:11.5px; color:var(--muted); }
+
+  /* ---- browse list: grouped by company, people underneath ---- */
+  main.results{ padding:16px clamp(14px,3vw,32px) 60px; }
+  .results-head{ display:flex; align-items:center; justify-content:space-between; margin:4px 0 10px; }
+  .results-head .count{ font-size:12.5px; color:var(--muted); }
+  .results-head .count .num{ font-variant-numeric:tabular-nums; font-weight:700; color:var(--ink); }
+
+  .results-list{ display:flex; flex-direction:column; gap:8px; }
+
+  @keyframes fadeSlideUp{ from{ opacity:0; transform:translateY(7px); } to{ opacity:1; transform:translateY(0); } }
+
+  .company-group{
+    border:1px solid var(--line); border-radius:var(--radius); background:var(--panel);
+    overflow:hidden; box-shadow:var(--shadow);
+    animation:fadeSlideUp .28s ease both;
+    transition:box-shadow .18s ease;
+  }
+  .company-group:hover{ box-shadow:0 2px 6px rgba(0,0,0,.10), 0 12px 26px rgba(0,0,0,.08); }
+
+  .company-head{
+    width:100%; display:flex; align-items:center; gap:6px;
+    background:var(--paper); padding:7px 8px 7px 14px;
+  }
+  .chead-toggle{
+    flex:1; min-width:0; display:flex; align-items:center; gap:10px; text-align:left;
+    background:none; border:none; cursor:pointer; padding:4px 4px; font-family:inherit; color:var(--ink);
+  }
+  .chead-toggle .chev{ font-size:10px; color:var(--muted); transition:transform .2s ease; flex:none; }
+  .company-group.collapsed .chev{ transform:rotate(-90deg); }
+  .chead-toggle .co-name{ font-weight:700; font-size:14.5px; }
+  .chead-toggle .co-count{
+    font-size:11px; color:var(--muted); background:var(--line-soft); padding:2px 9px; border-radius:20px;
+    font-variant-numeric:tabular-nums; flex:none;
+  }
+  .chead-copy{
+    flex:none; display:flex; align-items:center; gap:5px;
+    background:none; border:1px solid var(--line); color:var(--muted);
+    font-family:inherit; font-size:11px; padding:5px 10px; border-radius:20px; cursor:pointer;
+    transition:border-color .15s ease, color .15s ease, background .15s ease, transform .12s ease;
+    white-space:nowrap;
+  }
+  .chead-copy:hover{ border-color:#FF671C; color:#FF671C; }
+  .chead-copy:active{ transform:scale(.95); }
+  .chead-copy.flashed{ background:#FF671C; border-color:#FF671C; color:#fff; }
+
+  .company-people{ max-height:4000px; overflow:hidden; transition:max-height .3s ease; }
+  .company-group.collapsed .company-people{ max-height:0; }
+
+  .person-row{
+    display:flex; align-items:center; gap:12px;
+    padding:9px 14px 9px 30px; border-top:1px solid var(--line-soft);
+    position:relative;
+    transition:background .15s ease, padding-left .15s ease;
+  }
+  .person-row::before{
+    content:""; position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    width:5px; height:5px; border-radius:50%; background:var(--line);
+    transition:background .15s ease, transform .15s ease;
+  }
+  .person-row:hover{ background:var(--paper); padding-left:34px; }
+  .person-row:hover::before{ background:#FF671C; transform:translateY(-50%) scale(1.3); }
+  .person-main{ flex:1; min-width:0; }
+  .p-name{ font-weight:600; font-size:13.5px; }
+  .p-title{ color:var(--muted); font-size:12px; margin-top:1px; }
+  .person-contact{ text-align:right; font-size:12.5px; flex:none; }
+  .person-contact .em{ display:block; }
+  .person-contact .ph{ display:block; color:var(--muted); font-size:11.5px; margin-top:1px; font-variant-numeric:tabular-nums; }
+  .person-meta{ display:flex; align-items:center; gap:8px; flex:none; }
+  .person-copy{
+    flex:none; width:26px; height:26px; border-radius:50%;
+    background:none; border:1px solid transparent; color:var(--muted);
+    display:flex; align-items:center; justify-content:center; font-size:13px; cursor:pointer;
+    opacity:0; transition:opacity .15s ease, border-color .15s ease, color .15s ease, background .15s ease, transform .12s ease;
+  }
+  .person-row:hover .person-copy{ opacity:1; }
+  .person-copy:hover{ border-color:#FF671C; color:#FF671C; background:var(--panel); }
+  .person-copy:active{ transform:scale(.88); }
+  .person-copy.flashed{ opacity:1; background:#FF671C; border-color:#FF671C; color:#fff; }
+  .tag{ display:inline-block; font-size:10px; letter-spacing:.03em; padding:2px 6px; border-radius:2px; color:#fff; white-space:nowrap; flex:none; }
+  .tag.main{ background:var(--tag-main); }
+  .tag.ohio{ background:var(--tag-ohio); }
+  .tag.az{ background:var(--tag-az); }
+
+  .empty-state{ padding:50px 20px; text-align:center; color:var(--muted); font-size:13.5px; }
+  .load-more{ text-align:center; padding:12px; }
+  .load-more button{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    font-family:inherit; font-size:12.5px; padding:8px 16px; border-radius:var(--radius); cursor:pointer;
+    transition:transform .12s ease, border-color .15s ease;
+  }
+  .load-more button:hover{ border-color:#FF671C; transform:translateY(-1px); }
+  .load-more button:active{ transform:translateY(0) scale(.97); }
+
+  @media (prefers-reduced-motion: reduce){
+    .company-group{ animation:none; }
+    .company-people, .person-row, .person-row::before, .chev, .chip, .load-more button, .person-copy{ transition:none; }
+  }
+
+  @media (max-width:640px){
+    .person-row{ flex-wrap:wrap; row-gap:4px; padding-top:10px; padding-bottom:10px; }
+    .person-main{ flex:1 1 100%; }
+    .person-contact{ text-align:left; flex:1 1 auto; }
+    .person-copy{ opacity:1; }
+    .person-meta{ flex:none; margin-left:auto; }
+  }
+</style>
+
+<div class="shell">
+
+  <header class="hero" id="heroBanner">
+    <div class="hero-inner">
+      <img class="hero-logo" alt="DWG Capital Group" src="assets/logo.png">
+      <div class="hero-title">Broker Network</div>
+      <div class="hero-sub">National industrial sale-leaseback broker directory</div>
+    </div>
+  </header>
+
+  <div class="controls-bar">
+    <div class="controls-top">
+      <button class="theme-toggle" id="themeToggle" type="button">Theme</button>
+    </div>
+    <div class="controls">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="searchInput" type="text" placeholder="Search name, company, market, email, phone…" autocomplete="off">
+      </div>
+      <select class="filt" id="stateSelect">
+        <option value="">All Markets</option>
+      </select>
+    </div>
+    <div class="chipbar" id="catChips">
+      <button class="chip" data-cat="main" type="button">SLB Brokers</button>
+      <button class="chip active" data-cat="all" type="button">All Contacts</button>
+      <select class="chip-select" id="poolSelect">
+        <option value="">Tenant Rep Lists (by state) ▾</option>
+        <option value="ohio">Ohio</option>
+        <option value="az">Arizona</option>
+      </select>
+      <button class="chip addchip" id="addBrokerToggle" type="button" style="display:none;">+ Add Broker</button>
+    </div>
+    <div class="add-form" id="addForm" style="display:none;">
+      <div class="add-form-grid">
+        <input id="af_name" type="text" placeholder="Name *">
+        <input id="af_company" type="text" placeholder="Company">
+        <input id="af_title" type="text" placeholder="Position / Title">
+        <input id="af_phone" type="text" placeholder="Phone">
+        <input id="af_email" type="text" placeholder="Email">
+        <input id="af_state" type="text" placeholder="State (e.g. TX)" maxlength="2">
+        <select id="af_pool">
+          <option value="main">SLB Brokers</option>
+          <option value="ohio">Ohio Tenant Rep List</option>
+          <option value="az">Arizona Tenant Rep List</option>
+        </select>
+        <button id="af_save" type="button">Save Broker</button>
+      </div>
+      <div class="add-form-note" id="af_note">Saved here — visible to anyone who opens this page. No need to come back to chat.</div>
+    </div>
+  </div>
+
+  <div class="copy-panel">
+    <div class="copy-panel-head">
+      <div>
+        <div class="ttl" id="copyTitle">0 brokers match — copy the list below</div>
+        <div class="sub">Updates live as you search or filter. Select the box and Ctrl/Cmd+A, Ctrl/Cmd+C — or use the button.</div>
+      </div>
+      <div class="copy-actions">
+        <select class="fmt" id="fmtSelect">
+          <option value="table">Name · Company · Phone · Email</option>
+          <option value="email_semicolon">Emails only — semicolon separated</option>
+          <option value="email_comma">Emails only — comma separated</option>
+          <option value="csv">CSV</option>
+        </select>
+        <button class="copybtn" id="copyBtn" type="button">Copy List</button>
+        <span class="copy-flash" id="copyFlash"></span>
+      </div>
+    </div>
+    <textarea id="copyText" readonly spellcheck="false" onclick="this.select()"></textarea>
+    <div class="copy-note" id="copyNote"></div>
+  </div>
+
+  <div class="ask-panel" id="askPanel" style="display:none;">
+    <div class="ask-head">
+      <div class="ttl">Ask AI about these brokers</div>
+      <div class="sub" id="askScope">Answers using the currently filtered list.</div>
+    </div>
+    <div class="ask-row">
+      <input id="askInput" type="text" placeholder="e.g. &quot;Who are my CBRE contacts in Arizona?&quot; or &quot;How many brokers at JLL?&quot;" autocomplete="off">
+      <button class="asksend" id="askSendBtn" type="button">Ask</button>
+      <button class="askstop" id="askStopBtn" type="button" style="display:none;">Stop</button>
+    </div>
+    <div class="ask-answer" id="askAnswer" style="display:none;"></div>
+  </div>
+
+  <main class="results">
+    <div class="results-head">
+      <span class="count" id="resultsCount"></span>
+    </div>
+    <div class="results-list" id="resultsBody"></div>
+    <div class="empty-state" id="emptyState" style="display:none;">No brokers match that search.</div>
+    <div class="load-more" id="loadMoreWrap" style="display:none;">
+      <button id="loadMoreBtn" type="button">Show more companies</button>
+    </div>
+  </main>
+
+</div>
+
+<script src="brokers.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  // Contact records live in brokers.js (one record per line) so the list can be
+  // edited, diffed and reviewed in the repo instead of inside this file.
+  var DATA = Array.isArray(window.DWG_BROKERS) ? window.DWG_BROKERS : [];
+  var DATA_LOAD_FAILED = !DATA.length;
+  DATA.forEach(function(r,i){ r.id = 'base_'+i; });
+
+  var addedDocs = []; // live docs from db, merged in
+  var liveData = DATA;
+  var dbCol = null;
+
+  var state = { cat:'all', st:'', q:'', limit:60 };
+
+  function byId(id){ return document.getElementById(id); }
+
+  function rebuildLiveData(){
+    liveData = DATA.concat(addedDocs);
+  }
+
+  // ---- proper-case display helper (fixes ALL-CAPS source rows) ----
+  var CASE_KEEP = {LLC:1,INC:1,CBRE:1,SIOR:1,JLL:1,NAI:1,LLP:1,USA:1,III:1,II:1,IV:1,LP:1,PC:1,KW:1,RE:1,EVP:1,SVP:1,VP:1,CEO:1,CFO:1,COO:1,SF:1};
+  function smartCase(s){
+    if(!s) return s;
+    return s.replace(/[A-Za-z']+/g, function(word){
+      if(word !== word.toUpperCase()) return word; // already has lowercase somewhere — leave it
+      var bare = word.replace(/'/g,'');
+      if(bare.length<=2) return word;
+      if(CASE_KEEP[bare]) return word;
+      return word.charAt(0)+word.slice(1).toLowerCase();
+    });
+  }
+
+  function applyStoredTheme(){
+    try{
+      var t = localStorage.getItem('dwg_broker_theme');
+      if(t==='light'||t==='dark'){ document.documentElement.setAttribute('data-theme', t); }
+    }catch(e){}
+  }
+  applyStoredTheme();
+  byId('themeToggle').addEventListener('click', function(){
+    var cur = document.documentElement.getAttribute('data-theme');
+    var next = cur==='dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('dwg_broker_theme', next); }catch(e){}
+  });
+
+  var STATE_NAMES = {AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',DC:'D.C.'};
+
+  function populateStateSelect(){
+    var byState = {};
+    liveData.forEach(function(r){
+      if(state.cat!=='all' && r.cat!==state.cat) return;
+      var st = r.s || '—';
+      byState[st] = (byState[st]||0)+1;
+    });
+    var states = Object.keys(byState).filter(function(s){return s!=='—';}).sort(function(a,b){ return byState[b]-byState[a]; });
+    var html = '<option value="">All Markets</option>';
+    states.forEach(function(st){
+      var label = STATE_NAMES[st] ? (st+' — '+STATE_NAMES[st]) : st;
+      html += '<option value="'+st+'"'+(state.st===st?' selected':'')+'>'+label+' ('+byState[st]+')</option>';
+    });
+    if(byState['—']){
+      html += '<option value="—"'+(state.st==='—'?' selected':'')+'>Unspecified ('+byState['—']+')</option>';
+    }
+    byId('stateSelect').innerHTML = html;
+  }
+
+  function matches(r){
+    if(state.cat!=='all' && r.cat!==state.cat) return false;
+    if(state.st){
+      var st = r.s || '—';
+      if(st !== state.st) return false;
+    }
+    if(state.q){
+      var hay = (r.n+' '+r.c+' '+r.e+' '+r.p+' '+r.t+' '+r.s+' '+r.city).toLowerCase();
+      var terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
+      for(var i=0;i<terms.length;i++){ if(hay.indexOf(terms[i])===-1) return false; }
+    }
+    return true;
+  }
+
+  function escapeHtml(s){
+    return (s||'').replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+  }
+
+  function formatList(recs, fmt){
+    if(fmt==='email_semicolon'){ return recs.map(function(r){return r.e;}).filter(Boolean).join('; '); }
+    if(fmt==='email_comma'){ return recs.map(function(r){return r.e;}).filter(Boolean).join(', '); }
+    if(fmt==='csv'){
+      var lines = ['Name,Company,Position,Phone,Email,State'];
+      recs.forEach(function(r){
+        var row = [smartCase(r.n),smartCase(r.c),smartCase(r.t),r.p,r.e,r.s].map(function(v){ v=(v||'').replace(/"/g,'""'); return '"'+v+'"'; }).join(',');
+        lines.push(row);
+      });
+      return lines.join('\n');
+    }
+    return recs.map(function(r){
+      var bits = [smartCase(r.n)];
+      if(r.t) bits.push(smartCase(r.t));
+      if(r.c) bits.push(smartCase(r.c));
+      if(r.p) bits.push(r.p);
+      if(r.e) bits.push(r.e);
+      return bits.join('  |  ');
+    }).join('\n');
+  }
+
+  var collapsedGroups = {};
+  var lastCount = 0;
+
+  function animateCount(el, to){
+    var from = lastCount;
+    var start = null;
+    var dur = 320;
+    if(Math.abs(to-from) < 2 || (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)){
+      el.textContent = to.toLocaleString();
+      return;
+    }
+    function step(ts){
+      if(start===null) start=ts;
+      var p = Math.min(1, (ts-start)/dur);
+      var eased = 1 - Math.pow(1-p, 3);
+      var val = Math.round(from + (to-from)*eased);
+      el.textContent = val.toLocaleString();
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  var currentFiltered = [];
+
+  function computeFilteredSorted(){
+    var filtered = liveData.filter(matches);
+    filtered.sort(function(a,b){
+      var ca=(a.c||'').toLowerCase(), cb=(b.c||'').toLowerCase();
+      if(ca<cb) return -1; if(ca>cb) return 1;
+      var na=(a.n||'').toLowerCase(), nb=(b.n||'').toLowerCase();
+      if(na<nb) return -1; if(na>nb) return 1;
+      return 0;
+    });
+    return filtered;
+  }
+
+  function render(){
+    populateStateSelect();
+    var filtered = computeFilteredSorted();
+    currentFiltered = filtered;
+
+    byId('copyTitle').textContent = filtered.length.toLocaleString()+' broker'+(filtered.length===1?'':'s')+' match — copy the list below';
+    var fmt = byId('fmtSelect').value;
+    byId('copyText').value = formatList(filtered, fmt);
+    byId('copyNote').textContent = filtered.length > 800 ? 'Large list — copy may take a moment to select.' : '';
+
+    var askScopeEl = byId('askScope');
+    if(askScopeEl){
+      askScopeEl.textContent = 'Answers using the currently filtered list — '+filtered.length.toLocaleString()+' contact'+(filtered.length===1?'':'s')+' right now. Narrow your search/filters above for a more specific answer.';
+    }
+
+    var countEl = byId('resultsCount');
+    countEl.innerHTML = '<span class="num" id="resultsNum">0</span> broker'+(filtered.length===1?'':'s')+' shown below, grouped by company — the box above always has the full matching list';
+    animateCount(byId('resultsNum'), filtered.length);
+    lastCount = filtered.length;
+
+    // group by company FIRST, across the entire filtered set (not a sliced
+    // page of it) so headcounts and the most-brokers-first ranking are
+    // always accurate — fold empty/placeholder "company" values (blank, or
+    // parenthetical notes like "(Capital Markets Broker)") into one bucket
+    var groups = [];
+    var byCompany = {};
+    var NO_CO_KEY = '\u0000no-company';
+    filtered.forEach(function(r){
+      var raw = (r.c || '').trim();
+      var isPlaceholder = !raw || /^\(.*\)$/.test(raw);
+      var key = isPlaceholder ? NO_CO_KEY : raw.toLowerCase();
+      if(!byCompany[key]){
+        byCompany[key] = { name: isPlaceholder ? 'No Company Listed' : smartCase(raw), people: [] };
+        groups.push(byCompany[key]);
+      }
+      byCompany[key].people.push(r);
+    });
+
+    groups.sort(function(a,b){
+      if(b.people.length !== a.people.length) return b.people.length - a.people.length;
+      return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1;
+    });
+
+    var shownGroups = groups.slice(0, state.limit);
+
+    var html = shownGroups.map(function(g, idx){
+      var isCollapsed = !!collapsedGroups[g.name.toLowerCase()];
+      var peopleHtml = g.people.map(function(r, pidx){
+        var tagClass = r.cat==='ohio' ? 'ohio' : (r.cat==='az' ? 'az' : 'main');
+        var tagLabel = r.cat==='ohio' ? 'OH LEAD' : (r.cat==='az' ? 'AZ LEAD' : 'SLB');
+        var contact = '';
+        if(r.e){ contact += '<span class="em">'+escapeHtml(r.e)+'</span>'; }
+        if(r.p){ contact += '<span class="ph">'+escapeHtml(r.p)+'</span>'; }
+        return '<div class="person-row" data-pidx="'+pidx+'">'+
+          '<div class="person-main"><div class="p-name">'+escapeHtml(smartCase(r.n))+'</div>'+(r.t?'<div class="p-title">'+escapeHtml(smartCase(r.t))+'</div>':'')+'</div>'+
+          '<div class="person-contact">'+(contact||'<span style="color:var(--muted);">—</span>')+'</div>'+
+          '<div class="person-meta">'+
+            '<span class="tag '+tagClass+'">'+tagLabel+'</span>'+
+            '<button class="person-copy" type="button" title="Copy '+escapeHtml(smartCase(r.n))+'">⧉</button>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+      return '<div class="company-group'+(isCollapsed?' collapsed':'')+'" data-idx="'+idx+'">'+
+        '<div class="company-head">'+
+          '<button class="chead-toggle" type="button">'+
+            '<span class="chev">▾</span>'+
+            '<span class="co-name">'+escapeHtml(g.name)+'</span>'+
+            '<span class="co-count">'+g.people.length+'</span>'+
+          '</button>'+
+          '<button class="chead-copy" type="button" title="Copy everyone at '+escapeHtml(g.name)+'">⧉ Copy</button>'+
+        '</div>'+
+        '<div class="company-people">'+peopleHtml+'</div>'+
+      '</div>';
+    }).join('');
+
+    byId('resultsBody').innerHTML = html;
+    byId('emptyState').textContent = DATA_LOAD_FAILED
+      ? 'Contact data failed to load (brokers.js). Reload the page.'
+      : 'No brokers match that search.';
+    byId('emptyState').style.display = filtered.length===0 ? 'block' : 'none';
+    byId('loadMoreWrap').style.display = groups.length > state.limit ? 'block' : 'none';
+
+    Array.prototype.forEach.call(document.querySelectorAll('.company-group'), function(groupEl){
+      var idx = parseInt(groupEl.getAttribute('data-idx'), 10);
+      var g = shownGroups[idx];
+      var toggleBtn = groupEl.querySelector('.chead-toggle');
+      var copyBtn = groupEl.querySelector('.chead-copy');
+      toggleBtn.addEventListener('click', function(){
+        var key = g.name.toLowerCase();
+        collapsedGroups[key] = !collapsedGroups[key];
+        groupEl.classList.toggle('collapsed', collapsedGroups[key]);
+      });
+      copyBtn.addEventListener('click', function(){
+        var text = formatList(g.people, byId('fmtSelect').value);
+        copyTextToClipboard(text, function(ok){
+          copyBtn.textContent = ok ? 'Copied ✓' : 'Failed';
+          copyBtn.classList.toggle('flashed', ok);
+          setTimeout(function(){
+            copyBtn.textContent = '⧉ Copy';
+            copyBtn.classList.remove('flashed');
+          }, 1600);
+        });
+      });
+      Array.prototype.forEach.call(groupEl.querySelectorAll('.person-row'), function(rowEl){
+        var pidx = parseInt(rowEl.getAttribute('data-pidx'), 10);
+        var person = g.people[pidx];
+        var pcopyBtn = rowEl.querySelector('.person-copy');
+        pcopyBtn.addEventListener('click', function(e){
+          e.stopPropagation();
+          var text = formatList([person], byId('fmtSelect').value);
+          copyTextToClipboard(text, function(ok){
+            pcopyBtn.textContent = ok ? '✓' : '✕';
+            pcopyBtn.classList.toggle('flashed', ok);
+            setTimeout(function(){
+              pcopyBtn.textContent = '⧉';
+              pcopyBtn.classList.remove('flashed');
+            }, 1400);
+          });
+        });
+      });
+    });
+  }
+
+  var searchTimer;
+  byId('searchInput').addEventListener('input', function(){
+    clearTimeout(searchTimer);
+    var v = byId('searchInput').value;
+    searchTimer = setTimeout(function(){ state.q=v; state.limit=60; render(); }, 120);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('#catChips .chip[data-cat]'), function(btn){
+    btn.addEventListener('click', function(){
+      Array.prototype.forEach.call(document.querySelectorAll('#catChips .chip[data-cat]'), function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      byId('poolSelect').value = '';
+      byId('poolSelect').classList.remove('active');
+      state.cat = btn.getAttribute('data-cat');
+      state.st=''; state.limit=60; render();
+    });
+  });
+  byId('poolSelect').addEventListener('change', function(){
+    var v = byId('poolSelect').value;
+    if(!v){ return; } // placeholder re-selected — leave current filter as-is
+    Array.prototype.forEach.call(document.querySelectorAll('#catChips .chip[data-cat]'), function(b){ b.classList.remove('active'); });
+    byId('poolSelect').classList.add('active');
+    state.cat = v;
+    state.st=''; state.limit=60; render();
+  });
+  byId('stateSelect').addEventListener('change', function(){
+    state.st = byId('stateSelect').value; state.limit=60; render();
+  });
+  byId('fmtSelect').addEventListener('change', render);
+  byId('loadMoreBtn').addEventListener('click', function(){ state.limit += 60; render(); });
+
+  function copyTextToClipboard(text, onDone){
+    if(!text){ onDone(false); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){onDone(true);}).catch(function(){onDone(false);});
+    }else{
+      try{
+        var ta = document.createElement('textarea');
+        ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy'); document.body.removeChild(ta);
+        onDone(true);
+      }catch(err){ onDone(false); }
+    }
+  }
+
+  byId('copyBtn').addEventListener('click', function(){
+    var text = byId('copyText').value;
+    var flash = byId('copyFlash');
+    copyTextToClipboard(text, function(ok){
+      flash.textContent = ok ? 'Copied ✓' : 'Copy failed — click the box and press Ctrl/Cmd+A, Ctrl/Cmd+C';
+      setTimeout(function(){flash.textContent='';},2200);
+    });
+  });
+
+  // ---- live "Add Broker" via the db capability, so new brokers don't require a trip back to chat ----
+  byId('addBrokerToggle').addEventListener('click', function(){
+    var f = byId('addForm');
+    f.style.display = f.style.display==='none' ? 'block' : 'none';
+  });
+
+  function saveNewBroker(){
+    var name = byId('af_name').value.trim();
+    var email = byId('af_email').value.trim();
+    var phone = byId('af_phone').value.trim();
+    var note = byId('af_note');
+    if(!name){ note.textContent = 'Name is required.'; note.style.color = '#c15a5a'; return; }
+    if(!email && !phone){ note.textContent = 'Add a phone or email so this is reachable.'; note.style.color = '#c15a5a'; return; }
+    if(!dbCol){ note.textContent = 'Live save unavailable in this view — the artifact needs to be open on claude.ai.'; note.style.color = '#c15a5a'; return; }
+    var rec = {
+      n: name,
+      c: byId('af_company').value.trim(),
+      t: byId('af_title').value.trim(),
+      p: phone,
+      e: email,
+      s: byId('af_state').value.trim().toUpperCase(),
+      city: '',
+      src: 'Added on the page',
+      cat: byId('af_pool').value
+    };
+    note.textContent = 'Saving…'; note.style.color = '';
+    dbCol.add(rec).then(function(){
+      note.textContent = 'Saved — visible to anyone who opens this page.'; note.style.color = '';
+      byId('af_name').value=''; byId('af_company').value=''; byId('af_title').value='';
+      byId('af_phone').value=''; byId('af_email').value=''; byId('af_state').value='';
+      setTimeout(function(){ note.textContent = 'Saved here — visible to anyone who opens this page. No need to come back to chat.'; }, 2500);
+    }).catch(function(err){
+      note.textContent = 'Save failed: '+(err && err.message ? err.message : 'unknown error');
+      note.style.color = '#c15a5a';
+    });
+  }
+  byId('af_save').addEventListener('click', saveNewBroker);
+
+  function initDb(){
+    if(!(window.claude && window.claude.use)) return; // not running inside a claude.ai viewer
+    window.claude.use('db').then(function(db){
+      if(!db) return; // capability unavailable in this view
+      dbCol = db.collection('added_brokers');
+      byId('addBrokerToggle').style.display = 'inline-block';
+      dbCol.onSnapshot(function(snap){
+        addedDocs = snap.docs.map(function(d){
+          var data = d.data() || {};
+          data.id = 'added_'+d.id;
+          return data;
+        });
+        rebuildLiveData();
+        render();
+      }, function(err){
+        console.error('db subscribe error', err);
+      });
+    }).catch(function(){ /* db not available */ });
+  }
+  initDb();
+
+  // ---- "Ask AI" — answers questions grounded in whatever is currently filtered ----
+  var sampleFn = null;
+  var askAbortCtl = null;
+
+  function buildAskContext(){
+    // Cap to a safe byte budget (sample() allows ~64KB total input; leave
+    // most of that for the data, a slice for instructions+question).
+    var BUDGET = 45000;
+    var lines = [];
+    var used = 0;
+    var truncated = false;
+    for(var i=0;i<currentFiltered.length;i++){
+      var r = currentFiltered[i];
+      var line = smartCase(r.n)+' | '+(smartCase(r.c)||'—')+' | '+(smartCase(r.t)||'')+' | '+(r.p||'')+' | '+(r.e||'')+' | '+(r.s||'')+' | '+(r.cat==='ohio'?'Ohio Tenant Rep':r.cat==='az'?'Arizona Tenant Rep':'SLB Broker');
+      used += line.length + 1;
+      if(used > BUDGET){ truncated = true; break; }
+      lines.push(line);
+    }
+    return { text: lines.join('\n'), included: lines.length, total: currentFiltered.length, truncated: truncated };
+  }
+
+  function setAskBusy(busy){
+    byId('askSendBtn').disabled = busy;
+    byId('askStopBtn').style.display = busy ? 'inline-block' : 'none';
+  }
+
+  function runAsk(){
+    var q = byId('askInput').value.trim();
+    if(!q || !sampleFn) return;
+    var answerEl = byId('askAnswer');
+    answerEl.style.display = 'block';
+    answerEl.classList.remove('error');
+    answerEl.textContent = 'Thinking…';
+    setAskBusy(true);
+
+    var ctx = buildAskContext();
+    var prompt =
+      'You are answering a question about a broker/lead contact list for a commercial real estate firm (DWG Capital Partners). '+
+      'Use ONLY the data below — never invent a name, company, phone, or email that is not present. '+
+      'If the data does not contain the answer, say so plainly. Be concise — short prose or a short list, no headers.\n\n'+
+      'DATA (one contact per line: Name | Company | Title | Phone | Email | State | List) — '+ctx.included+' of '+ctx.total+' currently-filtered contacts'+(ctx.truncated?' (list truncated to fit — mention counts may be incomplete if the question is about totals)':'')+':\n'+
+      ctx.text+'\n\n'+
+      'QUESTION: '+q;
+
+    askAbortCtl = new AbortController();
+    sampleFn(prompt, {
+      modelTier: 'quick',
+      signal: askAbortCtl.signal,
+      onText: function(u){ answerEl.textContent = u.text; }
+    }).then(function(res){
+      setAskBusy(false);
+      if(res.truncated){
+        var note = document.createElement('span');
+        note.className = 'truncnote';
+        note.textContent = 'Answer was cut short.';
+        answerEl.appendChild(note);
+      }
+    }).catch(function(err){
+      setAskBusy(false);
+      if(err && err.code === 'cancelled') return;
+      answerEl.classList.add('error');
+      var msg = {
+        not_granted: 'Ask AI needs your permission — try again and allow it when prompted.',
+        rate_limited: 'Too many requests right now — try again in a moment.',
+        session_expired: 'Your session expired — refresh the page and sign in again.',
+        refused: 'That question couldn\'t be answered — try rephrasing it.',
+        empty_completion: 'No answer came back — try rephrasing the question.',
+        prompt_too_large: 'Too much data for one question — narrow your filters first.'
+      }[err && err.code] || 'Something went wrong — try again.';
+      answerEl.textContent = (err && err.text) ? err.text : msg;
+    });
+  }
+
+  function initSample(){
+    if(!(window.claude && window.claude.use)) return;
+    window.claude.use('sample').then(function(fn){
+      if(!fn) return; // unavailable in this view
+      sampleFn = fn;
+      byId('askPanel').style.display = 'block';
+    }).catch(function(){ /* unavailable */ });
+  }
+  initSample();
+
+  byId('askSendBtn').addEventListener('click', runAsk);
+  byId('askInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ runAsk(); }
+  });
+  byId('askStopBtn').addEventListener('click', function(){
+    if(askAbortCtl) askAbortCtl.abort();
+  });
+
+  render();
+})();
+</script>
